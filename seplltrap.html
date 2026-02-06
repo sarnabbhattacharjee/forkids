@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Trap: TOURNAMENT EDITION</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #2b32b2 0%, #1488cc 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- SCOREBOARD --- */
+        #scoreboard {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .team-box {
+            text-align: center;
+            background: white;
+            color: #333;
+            padding: 10px 40px;
+            border-radius: 20px;
+            min-width: 150px;
+            box-shadow: 0 5px 0 #bdc3c7;
+        }
+
+        .team-label { font-size: 1.2em; font-weight: bold; opacity: 0.7; }
+        .team-score { font-family: 'Fredoka One'; font-size: 3em; line-height: 1; }
+        #s-boys { color: #3498db; }
+        #s-girls { color: #ff6b81; }
+
+        /* --- TIMER BAR --- */
+        #timer-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background: #2ecc71;
+            transition: width 1s linear, background 0.5s;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        #timer-text {
+            position: absolute;
+            top: 25px; left: 50%; transform: translateX(-50%);
+            font-family: 'Fredoka One'; font-size: 2em;
+            color: white; text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+        }
+
+        /* --- GAME CENTER --- */
+        #game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #clue-box {
+            background: #f1c40f;
+            color: #2c3e50;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            max-width: 80%;
+            border: 4px solid white;
+        }
+
+        #puzzle-text {
+            font-family: 'Fredoka One';
+            font-size: 5em;
+            letter-spacing: 15px;
+            margin-bottom: 40px;
+            text-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+        }
+
+        /* --- BUTTONS --- */
+        #options-container {
+            display: flex;
+            gap: 40px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .option-btn {
+            background: white;
+            border: none;
+            padding: 20px 40px;
+            font-family: 'Fredoka One';
+            font-size: 2.5em;
+            color: #2c3e50;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 8px 0 #bdc3c7;
+            min-width: 300px;
+            border: 4px solid white;
+        }
+
+        .option-btn:active { transform: translateY(8px); box-shadow: none; }
+        .option-btn:hover { background: #ecf0f1; transform: translateY(-2px); }
+        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* --- CONTROL BUTTONS (Bottom) --- */
+        #controls-bottom {
+            position: absolute; bottom: 20px; width: 100%;
+            display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box;
+        }
+
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2); color: white;
+            border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer;
+            font-weight: bold; font-size: 1.2em; transition: 0.2s;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        .ctrl-btn:hover { background: white; color: #333; }
+        #btn-end { background: #c0392b; border-color: #e74c3c; }
+
+        /* --- HISTORY SIDEBAR --- */
+        #history-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(0,0,0,0.5); color: white;
+            border: 2px solid white; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-weight: bold;
+            z-index: 300;
+        }
+        #history-btn:hover { background: white; color: #333; }
+
+        #history-overlay {
+            position: absolute; top: 0; right: -400px; width: 350px; height: 100%;
+            background: #ecf0f1; color: #333;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+            z-index: 400; transition: right 0.3s ease;
+            display: flex; flex-direction: column;
+            padding: 20px; box-sizing: border-box;
+        }
+        #history-overlay.open { right: 0; }
+        
+        .history-item {
+            background: white; padding: 15px; margin-bottom: 10px;
+            border-radius: 10px; display: flex; justify-content: space-between;
+            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .b-win { color: #3498db; font-weight: bold; }
+        .g-win { color: #ff6b81; font-weight: bold; }
+        .draw { color: #f1c40f; font-weight: bold; }
+
+        /* --- ANIMATIONS --- */
+        .correct-anim { background: #2ecc71 !important; color: white !important; box-shadow: 0 8px 0 #27ae60 !important; transform: scale(1.1); }
+        .wrong-anim { background: #e74c3c !important; color: white !important; box-shadow: 0 8px 0 #c0392b !important; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* --- MODALS --- */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100;
+        }
+        .hidden { display: none !important; }
+
+        .modal-box {
+            background: white; padding: 40px; border-radius: 20px; text-align: center;
+            color: #333; border: 8px solid #f1c40f;
+        }
+        .btn-award { padding: 15px 30px; font-size: 1.5em; border: none; border-radius: 10px; cursor: pointer; font-family: 'Fredoka One'; margin: 10px; color: white; }
+        .b-btn { background: #3498db; }
+        .g-btn { background: #ff6b81; }
+
+        /* --- WINNER SCREEN --- */
+        #winner-title { font-family: 'Fredoka One'; font-size: 5em; margin-bottom: 20px; animation: pulse 1s infinite; }
+        #winner-score { font-size: 3em; margin-bottom: 30px; }
+        .btn-restart { padding: 20px 50px; font-size: 2em; border-radius: 50px; background: #2ecc71; color: white; border: none; font-family: 'Fredoka One'; cursor: pointer; }
+
+        /* --- START SCREEN --- */
+        #start-title { font-family: 'Fredoka One'; font-size: 5em; color: #f1c40f; text-shadow: 4px 4px 0 #000; margin: 0; animation: pulse 2s infinite; }
+        .btn-start-game { padding: 25px 60px; font-size: 2.5em; border: none; border-radius: 50px; cursor: pointer; font-family: 'Fredoka One'; color: white; background: #2ecc71; box-shadow: 0 10px 0 #27ae60; transition: 0.2s; }
+        .btn-start-game:hover { transform: translateY(-3px); }
+
+    </style>
+</head>
+<body>
+
+    <button id="history-btn" onclick="toggleHistory()">📜 HISTORY</button>
+
+    <div id="history-overlay">
+        <h2 style="margin-top:0; border-bottom: 2px solid #ccc; padding-bottom: 10px;">TOURNAMENT LOG</h2>
+        <div id="history-list" style="overflow-y: auto; flex: 1;"></div>
+        <button onclick="clearHistory()" style="background: #c0392b; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 10px;">🗑️ CLEAR DATA</button>
+        <button onclick="toggleHistory()" style="margin-top: 10px; background:#95a5a6; border:none; padding:10px; border-radius:10px; cursor:pointer; color:white;">CLOSE</button>
+    </div>
+
+    <div id="start-screen" class="overlay">
+        <h1 id="start-title">THE SPELLING TRAP</h1>
+        <p style="font-size: 2em; margin-bottom: 50px; opacity: 0.8;">TOURNAMENT MODE</p>
+        <button class="btn-start-game" onclick="initGame()">WE ARE READY! 🚀</button>
+    </div>
+
+    <div id="winner-screen" class="overlay hidden">
+        <h1 id="winner-title">BOYS WIN! 🏆</h1>
+        <div id="winner-score">Score: 5 - 3</div>
+        <button class="btn-restart" onclick="restartGame()">PLAY AGAIN 🔄</button>
+    </div>
+
+    <div id="scoreboard">
+        <div class="team-box">
+            <div class="team-label">BOYS</div>
+            <div class="team-score" id="score-boys" style="color:#3498db">0</div>
+        </div>
+        <div class="team-box">
+            <div class="team-label">GIRLS</div>
+            <div class="team-score" id="score-girls" style="color:#ff6b81">0</div>
+        </div>
+    </div>
+
+    <div id="timer-container">
+        <div id="timer-bar"></div>
+        <div id="timer-text">10</div>
+    </div>
+
+    <div id="game-area">
+        <div id="clue-box">WAITING...</div>
+        <div id="puzzle-text">_ _ _</div>
+        
+        <div id="options-container">
+            <button class="option-btn" id="btn-1" onclick="checkAnswer(1)">OPT 1</button>
+            <button class="option-btn" id="btn-2" onclick="checkAnswer(2)">OPT 2</button>
+        </div>
+    </div>
+
+    <div id="controls-bottom">
+        <button class="ctrl-btn" id="btn-end" onclick="endCompetition()">🛑 END COMPETITION</button>
+        <button class="ctrl-btn" onclick="nextRound()">SKIP QUESTION ⏭️</button>
+    </div>
+
+    <div id="modal-overlay" class="overlay hidden">
+        <div class="modal-box">
+            <h1 style="margin:0; font-size:3em; color:#2ecc71;">CORRECT!</h1>
+            <p style="font-size:1.5em;">Who answered correctly?</p>
+            <button class="btn-award b-btn" onclick="addPoint('boys')">BOYS</button>
+            <button class="btn-award g-btn" onclick="addPoint('girls')">GIRLS</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATABASE ---
+        const levels = [
+            ["A place to live", "HOUSE", "HORSE", "H _ _ S E"],
+            ["You wear this", "SHIRT", "SKIRT", "S _ I R T"],
+            ["A round toy", "BALL", "BELL", "B _ L L"],
+            ["It sails on water", "SHIP", "SHOP", "S H _ P"],
+            ["Opposite of cold", "HOT", "HAT", "H _ T"],
+            ["You wash hands with it", "SOAP", "SOUP", "S O _ P"],
+            ["A farm animal", "COW", "NOW", "_ O W"],
+            ["You cook in it", "PAN", "PEN", "P _ N"],
+            ["A color", "BLUE", "GLUE", "_ L U E"],
+            ["It flies in the sky", "PLANE", "PLAN", "P L A N _"],
+            ["Not noisy", "QUIET", "QUITE", "Q U _ _ T"],
+            ["A sweet treat", "DESSERT", "DESERT", "D E S _ E R T"],
+            ["Where you buy things", "STORE", "STORY", "S T O R _"],
+            ["To listen", "HEAR", "HERE", "H E _ R"],
+            ["A shape", "ANGLE", "ANGEL", "A N G _ E"],
+            ["Milk and Cheese", "DAIRY", "DIARY", "D _ _ R Y"],
+            ["You walk on it", "FLOOR", "FLOUR", "F L O _ R"],
+            ["Very big", "HUGE", "HUG", "H U G _"],
+            ["Opposite of weak", "STRONG", "STRING", "S T R _ N G"],
+            ["A green place", "GRASS", "GLASS", "G _ A S S"],
+            ["To give suggestion", "ADVISE", "ADVICE", "A D V I _ E"],
+            ["The weather right now", "WEATHER", "WHETHER", "W _ _ T H E R"],
+            ["Not tight", "LOOSE", "LOSE", "L O _ S E"],
+            ["Past tense of buy", "BOUGHT", "BROUGHT", "B _ O U G H T"],
+            ["A fruit", "PEAR", "PAIR", "P _ _ R"],
+            ["Part of a tree", "ROOT", "ROUTE", "R O _ T"],
+            ["To move fast", "RUN", "RAN", "R _ N"],
+            ["A coin", "CENT", "SCENT", "_ E N T"],
+            ["Group of people", "CROWD", "CLOUD", "C _ O _ D"],
+            ["To look at", "STARE", "STAIR", "S T A _ _"],
+            ["Eight (Number)", "EIGHT", "NIGHT", "_ I G H T"],
+            ["Opposite of right", "LEFT", "LIFT", "L _ F T"],
+            ["You write on it", "PAPER", "PEPPER", "P _ P E R"],
+            ["A month", "JUNE", "TUNE", "_ U N E"],
+            ["Feeling tired", "WEAK", "WEEK", "W E _ K"],
+            ["Where kings live", "CASTLE", "CATTLE", "C A _ T L E"],
+            ["To assist", "HELP", "HELD", "H E L _"],
+            ["Before second", "FIRST", "FIST", "F I _ S T"],
+            ["A small rug", "MAT", "MAP", "M A _"],
+            ["Body part", "MOUTH", "MONTH", "M O _ T H"]
+        ];
+
+        let scores = { boys: 0, girls: 0 };
+        let currentLevel = {};
+        let correctBtnIndex = 0;
+        let timeLeft = 10;
+        let timerInterval;
+        
+        // --- HISTORY SYSTEM ---
+        let matchHistory = JSON.parse(localStorage.getItem('spellingTrapHistory')) || [];
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = "";
+            if (matchHistory.length === 0) {
+                list.innerHTML = "<p style='text-align:center;'>No matches yet.</p>";
+                return;
+            }
+            matchHistory.slice().reverse().forEach((match, index) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                let winText = match.boys > match.girls ? "<span class='b-win'>BOYS</span>" : 
+                              match.girls > match.boys ? "<span class='g-win'>GIRLS</span>" : "<span class='draw'>DRAW</span>";
+                div.innerHTML = `<div>#${matchHistory.length - index} ${winText}</div><div>${match.boys} - ${match.girls}</div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function toggleHistory() {
+            document.getElementById('history-overlay').classList.toggle('open');
+            renderHistory();
+        }
+
+        function clearHistory() {
+            if(confirm("Delete all history?")) {
+                matchHistory = [];
+                localStorage.removeItem('spellingTrapHistory');
+                renderHistory();
+            }
+        }
+
+        function saveMatch() {
+            matchHistory.push({ boys: scores.boys, girls: scores.girls });
+            localStorage.setItem('spellingTrapHistory', JSON.stringify(matchHistory));
+        }
+
+        // --- GAME FUNCTIONS ---
+
+        function initGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            nextRound();
+        }
+
+        function restartGame() {
+            scores = { boys: 0, girls: 0 };
+            document.getElementById('score-boys').innerText = '0';
+            document.getElementById('score-girls').innerText = '0';
+            document.getElementById('winner-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        function endCompetition() {
+            clearInterval(timerInterval);
+            saveMatch();
+            
+            const winScreen = document.getElementById('winner-screen');
+            const winTitle = document.getElementById('winner-title');
+            const winScore = document.getElementById('winner-score');
+            
+            winScreen.classList.remove('hidden');
+            winScore.innerText = `Final: BOYS ${scores.boys} - ${scores.girls} GIRLS`;
+            
+            if (scores.boys > scores.girls) {
+                winTitle.innerText = "BOYS WIN! 🏆";
+                winTitle.style.color = "#3498db";
+            } else if (scores.girls > scores.boys) {
+                winTitle.innerText = "GIRLS WIN! 🏆";
+                winTitle.style.color = "#ff6b81";
+            } else {
+                winTitle.innerText = "IT'S A DRAW! 🤝";
+                winTitle.style.color = "#f1c40f";
+            }
+        }
+
+        function nextRound() {
+            clearInterval(timerInterval);
+            
+            // Reset Timer UI
+            timeLeft = 10;
+            document.getElementById('timer-text').innerText = "10";
+            document.getElementById('timer-bar').style.width = "100%";
+            document.getElementById('timer-bar').style.background = "#2ecc71";
+            document.getElementById('timer-bar').style.boxShadow = "0 0 10px #2ecc71";
+
+            const data = levels[Math.floor(Math.random() * levels.length)];
+            currentLevel = { clue: data[0], correct: data[1], wrong: data[2], blank: data[3] };
+
+            document.getElementById('clue-box').innerText = currentLevel.clue;
+            document.getElementById('puzzle-text').innerText = currentLevel.blank;
+            
+            const btn1 = document.getElementById('btn-1');
+            const btn2 = document.getElementById('btn-2');
+            
+            btn1.className = "option-btn"; btn2.className = "option-btn";
+            btn1.disabled = false; btn2.disabled = false;
+            btn1.style.background = "white"; btn2.style.background = "white";
+            btn1.style.color = "#2c3e50"; btn2.style.color = "#2c3e50";
+
+            if (Math.random() > 0.5) {
+                btn1.innerText = currentLevel.correct;
+                btn2.innerText = currentLevel.wrong;
+                correctBtnIndex = 1;
+            } else {
+                btn1.innerText = currentLevel.wrong;
+                btn2.innerText = currentLevel.correct;
+                correctBtnIndex = 2;
+            }
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-text').innerText = timeLeft;
+                
+                const percentage = (timeLeft / 10) * 100;
+                const bar = document.getElementById('timer-bar');
+                bar.style.width = percentage + "%";
+
+                if (timeLeft <= 5) {
+                    bar.style.background = "#e74c3c"; 
+                    bar.style.boxShadow = "0 0 10px #e74c3c";
+                } else if (timeLeft <= 7) {
+                    bar.style.background = "#f1c40f"; 
+                    bar.style.boxShadow = "0 0 10px #f1c40f";
+                }
+
+                if (timeLeft <= 0) {
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        function handleTimeUp() {
+            clearInterval(timerInterval);
+            document.getElementById('clue-box').innerText = "TIME'S UP! ⏰";
+            document.getElementById('btn-1').disabled = true;
+            document.getElementById('btn-2').disabled = true;
+            document.getElementById('btn-' + correctBtnIndex).style.background = "#2ecc71";
+            document.getElementById('btn-' + correctBtnIndex).style.color = "white";
+        }
+
+        function checkAnswer(btnIndex) {
+            clearInterval(timerInterval);
+            const btn = document.getElementById('btn-' + btnIndex);
+            
+            if (btnIndex === correctBtnIndex) {
+                btn.classList.add('correct-anim');
+                setTimeout(() => {
+                    document.getElementById('modal-overlay').classList.remove('hidden');
+                }, 500);
+            } else {
+                btn.classList.add('wrong-anim');
+                btn.disabled = true;
+                document.getElementById('clue-box').innerText = "WRONG! ❌";
+                document.getElementById('btn-' + correctBtnIndex).style.background = "#2ecc71";
+                document.getElementById('btn-' + correctBtnIndex).style.color = "white";
+            }
+        }
+
+        function addPoint(team) {
+            if (team === 'boys') {
+                scores.boys++;
+                document.getElementById('score-boys').innerText = scores.boys;
+            } else {
+                scores.girls++;
+                document.getElementById('score-girls').innerText = scores.girls;
+            }
+            document.getElementById('modal-overlay').classList.add('hidden');
+            nextRound();
+        }
+
+        // Initialize history
+        renderHistory();
+
+    </script>
+</body>
+</html>

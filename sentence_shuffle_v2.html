@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Shuffle: PRO EDITION</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #8e44ad 0%, #c0392b 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- SCOREBOARD --- */
+        #scoreboard {
+            display: flex; justify-content: space-between; padding: 15px 40px;
+            background: rgba(0,0,0,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10;
+        }
+        .team-box {
+            text-align: center; background: white; color: #333; padding: 5px 30px;
+            border-radius: 15px; min-width: 120px; box-shadow: 0 4px 0 #bdc3c7;
+        }
+        .team-label { font-size: 1em; font-weight: bold; opacity: 0.7; }
+        .team-score { font-family: 'Fredoka One'; font-size: 2.5em; line-height: 1; }
+        #s-boys { color: #3498db; }
+        #s-girls { color: #ff6b81; }
+
+        /* --- GAME AREA --- */
+        #game-area {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; position: relative;
+        }
+
+        /* --- ANSWER ZONE (Where blocks go) --- */
+        #answer-zone {
+            min-height: 80px; width: 90%; max-width: 900px;
+            background: rgba(255,255,255,0.2); border-radius: 15px;
+            border: 3px dashed rgba(255,255,255,0.4);
+            display: flex; justify-content: center; align-items: center; flex-wrap: wrap;
+            gap: 15px; padding: 15px; margin-bottom: 40px; transition: 0.3s;
+        }
+        #answer-zone.correct-zone { background: rgba(46, 204, 113, 0.3); border-color: #2ecc71; }
+        #answer-zone.wrong-zone { background: rgba(231, 76, 60, 0.3); border-color: #e74c3c; animation: shake 0.4s; }
+
+        /* --- SOURCE ZONE (Jumbled blocks) --- */
+        #source-zone {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 15px;
+            max-width: 900px;
+        }
+
+        /* --- WORDS --- */
+        .word-block {
+            background: white; color: #2c3e50; padding: 15px 25px;
+            font-family: 'Fredoka One'; font-size: 2em; border-radius: 12px;
+            cursor: pointer; user-select: none; box-shadow: 0 6px 0 #bdc3c7;
+            transition: transform 0.1s;
+        }
+        .word-block:active { transform: translateY(4px); box-shadow: none; }
+        .word-block:hover { transform: translateY(-2px); background: #f0f0f0; }
+
+        /* --- TIMER --- */
+        #timer-container { width: 100%; height: 15px; background: rgba(0,0,0,0.3); }
+        #timer-bar { height: 100%; width: 100%; background: #f1c40f; transition: width 1s linear; }
+
+        /* --- MODALS & OVERLAYS --- */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .hidden { display: none !important; }
+        
+        .modal-box {
+            background: white; padding: 40px; border-radius: 20px; text-align: center;
+            color: #333; border: 8px solid #f1c40f; animation: popIn 0.3s;
+        }
+        .btn-large {
+            padding: 15px 40px; font-size: 1.5em; border: none; border-radius: 50px;
+            cursor: pointer; font-family: 'Fredoka One'; margin: 10px; color: white;
+            transition: 0.2s;
+        }
+        .btn-large:hover { transform: scale(1.05); }
+
+        /* --- ANIMATIONS --- */
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- SETTINGS --- */
+        #settings-bar {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 30px;
+            display: flex; gap: 10px;
+        }
+        .diff-btn {
+            background: transparent; border: 2px solid white; color: white;
+            padding: 5px 15px; border-radius: 15px; cursor: pointer; font-weight: bold;
+        }
+        .diff-btn.active { background: white; color: #333; }
+
+        /* --- CONTROLS --- */
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2); color: white; border: none;
+            padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;
+            margin: 0 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="start-screen" class="overlay">
+        <h1 style="font-family: 'Fredoka One'; font-size: 5em; color: #f1c40f; margin: 0;">SENTENCE SHUFFLE</h1>
+        <p style="font-size: 2em; margin-bottom: 40px;">Put the words in the correct order!</p>
+        <button class="btn-large" style="background: #27ae60;" onclick="startGame()">START GAME 🚀</button>
+    </div>
+
+    <div id="winner-screen" class="overlay hidden">
+        <h1 id="winner-title" style="font-family: 'Fredoka One'; font-size: 5em;">WINNER!</h1>
+        <div id="winner-score" style="font-size: 2em; margin-bottom: 20px;">0 - 0</div>
+        <button class="btn-large" style="background: #3498db;" onclick="restartGame()">PLAY AGAIN</button>
+    </div>
+
+    <div id="scoreboard">
+        <div class="team-box">
+            <div class="team-label">BOYS</div>
+            <div id="score-boys" class="team-score">0</div>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <button class="ctrl-btn" onclick="toggleHistory()">📜 LOG</button>
+            <button class="ctrl-btn" style="background: #c0392b;" onclick="endGame()">🛑 END</button>
+        </div>
+        <div class="team-box">
+            <div class="team-label">GIRLS</div>
+            <div id="score-girls" class="team-score">0</div>
+        </div>
+    </div>
+
+    <div id="timer-container"><div id="timer-bar"></div></div>
+
+    <div id="game-area">
+        <div id="answer-zone"></div>
+        <div id="source-zone"></div>
+        <div style="margin-top: 30px;">
+            <button class="ctrl-btn" onclick="resetRound()">🔄 RESET WORDS</button>
+            <button class="ctrl-btn" onclick="skipRound()">⏭️ SKIP</button>
+        </div>
+    </div>
+
+    <div id="settings-bar">
+        <button class="diff-btn active" onclick="setDiff('easy', this)">EASY</button>
+        <button class="diff-btn" onclick="setDiff('medium', this)">MEDIUM</button>
+        <button class="diff-btn" onclick="setDiff('hard', this)">HARD</button>
+    </div>
+
+    <div id="point-modal" class="overlay hidden">
+        <div class="modal-box">
+            <h2 style="color: #27ae60; font-size: 2.5em; margin:0;">PERFECT SENTENCE!</h2>
+            <p id="correct-sent-display" style="font-size: 1.5em; font-weight: bold; color: #555;">...</p>
+            <p>Who solved it?</p>
+            <button class="btn-large" style="background: #3498db;" onclick="awardPoint('boys')">BOYS</button>
+            <button class="btn-large" style="background: #ff6b81;" onclick="awardPoint('girls')">GIRLS</button>
+        </div>
+    </div>
+
+    <div id="history-modal" class="overlay hidden" style="background: rgba(0,0,0,0.8);">
+        <div class="modal-box" style="width: 400px; text-align: left;">
+            <h2 style="border-bottom: 2px solid #ddd; padding-bottom: 10px;">MATCH HISTORY</h2>
+            <div id="history-list" style="height: 200px; overflow-y: auto;"></div>
+            <button class="btn-large" style="background: #7f8c8d; font-size: 1em; width: 100%;" onclick="toggleHistory()">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA: UPGRADED DIFFICULTY ---
+        const data = {
+            easy: [
+                "THE CAT IS RED", "I LIKE PIZZA", "THE SUN IS HOT", "DOGS CAN RUN FAST",
+                "MY MOM IS NICE", "I HAVE A PEN", "THE SKY IS BLUE", "WE PLAY GAMES",
+                "BIRDS CAN FLY HIGH", "FISH SWIM IN WATER", "THE BALL IS ROUND", "SHE HAS A CAT",
+                "HE IS MY FRIEND", "APPLES ARE RED", "MILK IS WHITE", "I GO TO SCHOOL"
+            ],
+            medium: [
+                "MY BROTHER PLAYS FOOTBALL IN THE PARK", 
+                "WHERE IS THE LIBRARY LOCATED", 
+                "I EAT A HEALTHY BREAKFAST EVERY DAY",
+                "SHE IS READING A VERY INTERESTING BOOK", 
+                "THEY ARE GOING HOME AFTER SCHOOL", 
+                "MY ENGLISH TEACHER IS VERY KIND",
+                "WE WATCHED A SCARY MOVIE YESTERDAY", 
+                "DO YOU LIKE CHOCOLATE ICE CREAM", 
+                "THE RED CAR IS VERY FAST",
+                "IT IS RAINING HEAVILY OUTSIDE NOW", 
+                "PLEASE OPEN THE DOOR FOR ME", 
+                "CAN YOU HELP ME WITH HOMEWORK",
+                "THE TIGER IS A STRONG ANIMAL", 
+                "SUMMER IS VERY HOT IN THIS CITY"
+            ],
+            hard: [
+                "IF IT RAINS TOMORROW WE WILL STAY INSIDE",
+                "THE GREAT WALL OF CHINA IS VISIBLE FROM SPACE",
+                "SHE WAS COOKING DINNER WHILE HE WAS READING",
+                "ALTHOUGH HE WAS TIRED HE KEPT WORKING HARD",
+                "HAVE YOU EVER VISITED THE EIFEL TOWER IN PARIS",
+                "THE FASTEST ANIMAL ON LAND IS THE CHEETAH",
+                "WE SHOULD ALWAYS TRY TO HELP OTHER PEOPLE",
+                "YESTERDAY I BOUGHT A GIFT FOR MY BEST FRIEND",
+                "SCIENCE IS THE STUDY OF THE NATURAL WORLD",
+                "WITHOUT WATER NO LIFE CAN SURVIVE ON EARTH",
+                "THE MOON ORBITS AROUND THE EARTH EVERY MONTH",
+                "BEFORE YOU EAT DINNER YOU MUST WASH YOUR HANDS"
+            ]
+        };
+
+        let currentDiff = 'easy';
+        let currentSentence = [];
+        let placedWords = [];
+        let scores = { boys: 0, girls: 0 };
+        let timerInterval;
+        let timeLeft = 45;
+
+        // --- GAME LOGIC ---
+        function setDiff(level, btn) {
+            currentDiff = level;
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            nextRound();
+        }
+
+        function nextRound() {
+            clearInterval(timerInterval);
+            timeLeft = 60; // Increased time for harder sentences
+            startTimer();
+
+            // Clear zones
+            document.getElementById('answer-zone').innerHTML = "";
+            document.getElementById('source-zone').innerHTML = "";
+            document.getElementById('answer-zone').className = "";
+            placedWords = [];
+
+            // Pick sentence
+            const pool = data[currentDiff];
+            const sentenceStr = pool[Math.floor(Math.random() * pool.length)];
+            currentSentence = sentenceStr.split(" ");
+            
+            // Create shuffled copy
+            let shuffled = [...currentSentence];
+            shuffled.sort(() => Math.random() - 0.5);
+
+            // Render words
+            shuffled.forEach(word => {
+                const btn = document.createElement('div');
+                btn.className = 'word-block';
+                btn.innerText = word;
+                btn.onclick = () => handleWordClick(btn, word);
+                document.getElementById('source-zone').appendChild(btn);
+            });
+        }
+
+        function handleWordClick(btnElement, wordText) {
+            document.getElementById('answer-zone').appendChild(btnElement);
+            btnElement.onclick = () => returnWord(btnElement, wordText);
+            placedWords.push(wordText);
+            checkOrder();
+        }
+
+        function returnWord(btnElement, wordText) {
+            document.getElementById('source-zone').appendChild(btnElement);
+            btnElement.onclick = () => handleWordClick(btnElement, wordText);
+            const index = placedWords.indexOf(wordText);
+            if (index > -1) placedWords.splice(index, 1);
+            document.getElementById('answer-zone').className = ""; 
+        }
+
+        function checkOrder() {
+            const zone = document.getElementById('answer-zone');
+            
+            let isCorrectSoFar = true;
+            for(let i=0; i<placedWords.length; i++) {
+                if (placedWords[i] !== currentSentence[i]) {
+                    isCorrectSoFar = false;
+                    break;
+                }
+            }
+
+            if (!isCorrectSoFar) {
+                zone.classList.add('wrong-zone');
+                setTimeout(() => zone.classList.remove('wrong-zone'), 500);
+            } else {
+                zone.classList.remove('wrong-zone');
+                if (placedWords.length === currentSentence.length) {
+                    zone.classList.add('correct-zone');
+                    clearInterval(timerInterval);
+                    setTimeout(() => { showPointModal(); }, 500);
+                }
+            }
+        }
+
+        function resetRound() {
+            const btns = Array.from(document.querySelectorAll('.word-block'));
+            const source = document.getElementById('source-zone');
+            btns.forEach(btn => {
+                const txt = btn.innerText;
+                btn.onclick = () => handleWordClick(btn, txt);
+                source.appendChild(btn);
+            });
+            placedWords = [];
+            document.getElementById('answer-zone').className = "";
+        }
+
+        function showPointModal() {
+            document.getElementById('point-modal').classList.remove('hidden');
+            document.getElementById('correct-sent-display').innerText = currentSentence.join(" ");
+        }
+
+        function awardPoint(team) {
+            if (team === 'boys') {
+                scores.boys++;
+                document.getElementById('score-boys').innerText = scores.boys;
+            } else {
+                scores.girls++;
+                document.getElementById('score-girls').innerText = scores.girls;
+            }
+            document.getElementById('point-modal').classList.add('hidden');
+            nextRound();
+        }
+
+        function skipRound() {
+            nextRound();
+        }
+
+        // --- TIMER ---
+        function startTimer() {
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = "100%";
+            bar.style.background = "#f1c40f";
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const pct = (timeLeft / 60) * 100;
+                bar.style.width = pct + "%";
+                if (timeLeft < 10) bar.style.background = "#e74c3c";
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("TIME'S UP! Try again.");
+                    resetRound();
+                    timeLeft = 60; 
+                    startTimer();
+                }
+            }, 1000);
+        }
+
+        // --- END & RESTART ---
+        function endGame() {
+            clearInterval(timerInterval);
+            saveHistory();
+            document.getElementById('winner-screen').classList.remove('hidden');
+            document.getElementById('winner-score').innerText = `BOYS ${scores.boys} - ${scores.girls} GIRLS`;
+            
+            const title = document.getElementById('winner-title');
+            if (scores.boys > scores.girls) { title.innerText = "BOYS WIN!"; title.style.color = "#3498db"; }
+            else if (scores.girls > scores.boys) { title.innerText = "GIRLS WIN!"; title.style.color = "#ff6b81"; }
+            else { title.innerText = "DRAW!"; title.style.color = "#f1c40f"; }
+        }
+
+        function restartGame() {
+            // Reset scores
+            scores = { boys: 0, girls: 0 };
+            document.getElementById('score-boys').innerText = '0';
+            document.getElementById('score-girls').innerText = '0';
+            
+            // Hide winner screen
+            document.getElementById('winner-screen').classList.add('hidden');
+            
+            // Start a new game
+            nextRound();
+        }
+
+        function saveHistory() {
+            let hist = JSON.parse(localStorage.getItem('sentenceShuffleHistory')) || [];
+            hist.push({ date: new Date().toLocaleTimeString(), b: scores.boys, g: scores.girls });
+            localStorage.setItem('sentenceShuffleHistory', JSON.stringify(hist));
+        }
+
+        function toggleHistory() {
+            const modal = document.getElementById('history-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                const list = document.getElementById('history-list');
+                list.innerHTML = "";
+                let hist = JSON.parse(localStorage.getItem('sentenceShuffleHistory')) || [];
+                hist.slice().reverse().forEach(h => {
+                    list.innerHTML += `<div style="background:white; padding:10px; margin:5px; border-radius:5px;">
+                        <b>${h.date}</b>: Boys ${h.b} - ${h.g} Girls
+                    </div>`;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
