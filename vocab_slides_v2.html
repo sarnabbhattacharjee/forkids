@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocab Master: Pro Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- SLIDE STAGE --- */
+        #slide-stage {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; z-index: 1;
+        }
+
+        .card-box {
+            background: white; color: #333; width: 85%; max-width: 1000px;
+            padding: 80px 40px; border-radius: 30px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative;
+            border-bottom: 12px solid #ddd;
+        }
+
+        #english-word {
+            font-family: 'Fredoka One', cursive; font-size: 5.5em; color: #2c3e50;
+            margin: 0; line-height: 1.1; letter-spacing: 2px;
+        }
+
+        #bangla-meaning {
+            font-size: 3.5em; margin-top: 30px; color: #e74c3c; font-weight: bold;
+            transition: 0.4s ease-out; cursor: pointer; padding: 15px 40px;
+            border-radius: 15px; display: inline-block; min-width: 200px;
+        }
+
+        /* EFFECTS */
+        .blur { filter: blur(30px); background: #f0f0f0; user-select: none; color: transparent; }
+        .reveal { filter: blur(0); background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+        
+        .hint-text { color: #95a5a6; margin-top: 15px; font-size: 1.2em; font-style: italic; }
+
+        /* --- CONTROLS --- */
+        .controls-bar { margin-top: 40px; display: flex; gap: 20px; z-index: 10; }
+
+        .btn {
+            border: none; padding: 15px 40px; font-size: 1.5em; border-radius: 50px;
+            cursor: pointer; font-family: 'Fredoka One'; transition: 0.2s;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+        }
+        .btn:active { transform: translateY(4px); box-shadow: none; }
+        
+        .btn-nav { background: #f1c40f; color: #333; }
+        .btn-whiteboard { background: #2c3e50; color: white; border: 2px solid white; box-shadow: 0 6px 0 #1a252f; }
+        
+        /* EXIT BUTTON STYLE */
+        .btn-exit { 
+            background: #c0392b; color: white; position: absolute; top: 20px; right: 20px; 
+            font-size: 1.2em; padding: 10px 30px; border: 2px solid rgba(255,255,255,0.3);
+            z-index: 200; /* High z-index to make sure it's clickable */
+        }
+        .btn-exit:hover { background: #e74c3c; }
+
+        /* --- WHITEBOARD OVERLAY --- */
+        #whiteboard-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 100; display: none; cursor: crosshair;
+        }
+
+        #wb-toolbar {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #eee; padding: 15px 30px; border-radius: 60px;
+            display: flex; align-items: center; gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #ccc;
+        }
+
+        .tool-group { display: flex; gap: 10px; border-right: 2px solid #ccc; padding-right: 20px; }
+        .tool-btn { width: 45px; height: 45px; border-radius: 50%; border: 3px solid white; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .tool-btn:hover { transform: scale(1.1); }
+        .tool-btn.active { border-color: #333; transform: scale(1.2); z-index: 5; }
+
+        .color-black { background: black; }
+        .color-red { background: #e74c3c; }
+        .color-blue { background: #3498db; }
+        .color-green { background: #2ecc71; }
+        
+        .btn-eraser { background: white; font-size: 1.5em; display: flex; align-items: center; justify-content: center; }
+
+        /* SLIDER STYLE */
+        .slider-group { display: flex; align-items: center; gap: 10px; color: #333; font-weight: bold; }
+        input[type=range] { width: 100px; cursor: pointer; }
+
+        .btn-close-wb {
+            background: #c0392b; color: white; font-family: 'Fredoka One'; border: none;
+            padding: 10px 30px; border-radius: 30px; font-size: 1.2em; cursor: pointer;
+            margin-left: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button class="btn btn-exit" onclick="window.location.href='index.html'">EXIT 🏠</button>
+
+    <div id="slide-stage">
+        <div class="card-box">
+            <h1 id="english-word">Loading...</h1>
+            <div id="bangla-meaning" class="blur" onclick="toggleReveal()">...</div>
+            <div class="hint-text">(Click/Touch box to reveal meaning)</div>
+        </div>
+
+        <div class="controls-bar">
+            <button class="btn btn-nav" onclick="prevSlide()">⬅ PREV</button>
+            <button class="btn btn-whiteboard" onclick="openWhiteboard()">🎨 OPEN BOARD</button>
+            <button class="btn btn-nav" onclick="nextSlide()">NEXT ➡</button>
+        </div>
+    </div>
+
+    <div id="whiteboard-overlay">
+        <canvas id="drawing-canvas"></canvas>
+        
+        <div id="wb-toolbar">
+            <div class="tool-group">
+                <div class="tool-btn color-black active" onclick="setColor('black', this)"></div>
+                <div class="tool-btn color-red" onclick="setColor('#e74c3c', this)"></div>
+                <div class="tool-btn color-blue" onclick="setColor('#3498db', this)"></div>
+                <div class="tool-btn color-green" onclick="setColor('#2ecc71', this)"></div>
+                <button class="tool-btn btn-eraser" onclick="setEraser(this)">🧹</button>
+            </div>
+
+            <div class="slider-group">
+                <span>🖊️ Boldness:</span>
+                <input type="range" id="pen-size" min="2" max="30" value="5" oninput="updateSize(this.value)">
+            </div>
+
+            <button class="btn-close-wb" onclick="clearBoard()">CLEAR</button>
+            <button class="btn-close-wb" style="background:#333;" onclick="closeWhiteboard()">CLOSE ✖</button>
+        </div>
+    </div>
+
+    <script>
+        // --- EXPANDED WORD DATABASE (200+ Words) ---
+        const words = [
+            // --- EASY / COMMON ---
+            { en: "Adventure", bn: "দুঃসাহসিক কাজ" }, { en: "Beautiful", bn: "সুন্দর" },
+            { en: "Curious", bn: "কৌতূহলী" }, { en: "Dangerous", bn: "বিপজ্জনক" },
+            { en: "Education", bn: "শিক্ষা" }, { en: "Fantastic", bn: "অসাধারণ" },
+            { en: "Generous", bn: "উদার" }, { en: "Holiday", bn: "ছুটির দিন" },
+            { en: "Important", bn: "গুরুত্বপূর্ণ" }, { en: "Journey", bn: "ভ্রমণ" },
+            { en: "Knowledge", bn: "জ্ঞান" }, { en: "Library", bn: "গ্রন্থাগার" },
+            { en: "Mountain", bn: "পাহাড়" }, { en: "Nature", bn: "প্রকৃতি" },
+            { en: "Ocean", bn: "সমুদ্র" }, { en: "Patient", bn: "ধৈর্যশীল" },
+            { en: "Question", bn: "প্রশ্ন" }, { en: "Respect", bn: "সম্মান" },
+            { en: "Scientist", bn: "বিজ্ঞানী" }, { en: "Together", bn: "একসাথে" },
+            { en: "Umbrella", bn: "ছাতা" }, { en: "Vacation", bn: "অবকাশ" },
+            { en: "Weather", bn: "আবহাওয়া" }, { en: "Yesterday", bn: "গতকাল" },
+            
+            // --- MEDIUM / ACADEMIC ---
+            { en: "Accommodate", bn: "মানিয়ে নেওয়া" }, { en: "Benevolent", bn: "পরোপকারী" },
+            { en: "Consequence", bn: "ফলাফল" }, { en: "Diligent", bn: "পরিশ্রমী" },
+            { en: "Efficient", bn: "দক্ষ" }, { en: "Frequent", bn: "ঘনঘন" },
+            { en: "Genuine", bn: "খাঁটি" }, { en: "Hesitate", bn: "দ্বিধা করা" },
+            { en: "Innocent", bn: "নির্দোষ" }, { en: "Jealous", bn: "ঈর্ষান্বিত" },
+            { en: "Keen", bn: "আগ্রহী" }, { en: "Leisure", bn: "অবসর" },
+            { en: "Moderate", bn: "মাঝারি" }, { en: "Narrate", bn: "বর্ণনা করা" },
+            { en: "Obedient", bn: "বাধ্য" }, { en: "Predict", bn: "ভবিষ্যদ্বাণী করা" },
+            { en: "Quality", bn: "গুণমান" }, { en: "Reliable", bn: "নির্ভরযোগ্য" },
+            { en: "Strategy", bn: "কৌশল" }, { en: "Tradition", bn: "ঐতিহ্য" },
+            { en: "Unique", bn: "অনন্য" }, { en: "Valuable", bn: "মূল্যবান" },
+            { en: "Wisdom", bn: "প্রজ্ঞা" }, { en: "Xenophobia", bn: "বিদেশী ভীতি" },
+            { en: "Youth", bn: "যৌবন" }, { en: "Zeal", bn: "প্রবল উৎসাহ" },
+
+            // --- HARD / CHALLENGING ---
+            { en: "Ambiguous", bn: "অস্পষ্ট" }, { en: "Bureaucracy", bn: "আমলাতন্ত্র" },
+            { en: "Chronological", bn: "কালানুক্রমিক" }, { en: "Deteriorate", bn: "অবনতি ঘটা" },
+            { en: "Enthusiastic", bn: "উৎসাহী" }, { en: "Fluctuate", bn: "ওঠানামা করা" },
+            { en: "Hypocrisy", bn: "ভণ্ডামি" }, { en: "Inevitable", bn: "অনিবার্য" },
+            { en: "Justification", bn: "যৌক্তিকতা" }, { en: "Kleptomania", bn: "চুরির বাতিক" },
+            { en: "Legitimate", bn: "বৈধ" }, { en: "Metaphor", bn: "রূপক" },
+            { en: "Nostalgia", bn: "অতীতের স্মৃতি" }, { en: "Optimistic", bn: "আশাবাদী" },
+            { en: "Pessimistic", bn: "নৈরাশ্যবাদী" }, { en: "Quarantine", bn: "সঙ্গনিরোধ" },
+            { en: "Rejuvenate", bn: "সজীব করা" }, { en: "Simultaneous", bn: "যুগপৎ / একই সাথে" },
+            { en: "Transparent", bn: "স্বচ্ছ" }, { en: "Unanimous", bn: "সর্বসম্মত" },
+            { en: "Vulnerable", bn: "অরক্ষিত" }, { en: "Wholesome", bn: "স্বাস্থ্যকর" },
+            
+            // --- SCIENCE & NATURE ---
+            { en: "Atmosphere", bn: "বায়ুমণ্ডল" }, { en: "Bacteria", bn: "ব্যাকটেরিয়া" },
+            { en: "Climate", bn: "জলবায়ু" }, { en: "Digestion", bn: "হজম" },
+            { en: "Ecosystem", bn: "বাস্তুতন্ত্র" }, { en: "Fossil", bn: "জীবাশ্ম" },
+            { en: "Gravity", bn: "মাধ্যাকর্ষণ" }, { en: "Habitat", bn: "আবাসস্থল" },
+            { en: "Invention", bn: "আবিষ্কার" }, { en: "Jupiter", bn: "বৃহস্পতি গ্রহ" },
+            { en: "Kinetic", bn: "গতিশীল" }, { en: "Laboratory", bn: "গবেষণাগার" },
+            { en: "Microscope", bn: "অণুবীক্ষণ যন্ত্র" }, { en: "Nutrition", bn: "পুষ্টি" },
+            { en: "Oxygen", bn: "অক্সিজেন" }, { en: "Pollution", bn: "দূষণ" },
+            { en: "Quantity", bn: "পরিমাণ" }, { en: "Radiation", bn: "বিকিরণ" },
+            { en: "Satellite", bn: "উপগ্রহ" }, { en: "Temperature", bn: "তাপমাত্রা" },
+            { en: "Velocity", bn: "বেগ" }, { en: "Zoology", bn: "প্রাণীবিদ্যা" }
+        ];
+
+        let currentIndex = 0;
+
+        // --- SLIDE FUNCTIONS ---
+        function renderSlide() {
+            const wordObj = words[currentIndex];
+            document.getElementById('english-word').innerText = wordObj.en;
+            const bnText = document.getElementById('bangla-meaning');
+            bnText.innerText = wordObj.bn;
+            bnText.className = "blur"; // Default hidden
+        }
+
+        function toggleReveal() {
+            const bnText = document.getElementById('bangla-meaning');
+            bnText.className = bnText.classList.contains('blur') ? "reveal" : "blur";
+        }
+
+        function nextSlide() {
+            if (currentIndex < words.length - 1) {
+                currentIndex++;
+                renderSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderSlide();
+            }
+        }
+        
+        // Keyboard support for slides
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('whiteboard-overlay').style.display === 'block') return;
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === ' ' || e.key === 'Enter') toggleReveal();
+        });
+
+        renderSlide(); // Init
+
+        // --- WHITEBOARD FUNCTIONS ---
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+        let currentColor = "black";
+        let currentSize = 5;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function startPosition(e) {
+            painting = true;
+            draw(e);
+        }
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!painting) return;
+            e.preventDefault();
+            
+            let clientX, clientY;
+            if(e.type === 'touchmove' || e.type === 'touchstart') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            ctx.lineWidth = currentSize;
+            ctx.lineCap = 'round'; // Smooth edges
+            ctx.lineJoin = 'round'; // Smooth corners
+            ctx.strokeStyle = currentColor;
+
+            ctx.lineTo(clientX, clientY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(clientX, clientY);
+        }
+
+        // Event Listeners
+        ['mousedown', 'touchstart'].forEach(evt => canvas.addEventListener(evt, startPosition));
+        ['mouseup', 'touchend'].forEach(evt => canvas.addEventListener(evt, endPosition));
+        ['mousemove', 'touchmove'].forEach(evt => canvas.addEventListener(evt, draw));
+
+        // Toolbar Logic
+        function openWhiteboard() {
+            document.getElementById('whiteboard-overlay').style.display = 'block';
+        }
+
+        function closeWhiteboard() {
+            document.getElementById('whiteboard-overlay').style.display = 'none';
+        }
+
+        function setColor(color, btn) {
+            currentColor = color;
+            // Restore size if we were erasing
+            currentSize = document.getElementById('pen-size').value; 
+            updateActiveBtn(btn);
+        }
+
+        function setEraser(btn) {
+            currentColor = "white";
+            // Eraser acts relative to size, but bigger
+            currentSize = document.getElementById('pen-size').value * 2; 
+            updateActiveBtn(btn);
+        }
+
+        function updateSize(val) {
+            currentSize = val;
+            if (currentColor === "white") {
+                currentSize = val * 2; // Keep eraser bigger
+            }
+        }
+
+        function clearBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateActiveBtn(activeBtn) {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            activeBtn.classList.add('active');
+        }
+
+    </script>
+</body>
+</html>
