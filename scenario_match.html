@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scenario Match: PRO EDITION</title>
+    <title>Scenario Match: MEGA EDITION</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
 
@@ -21,17 +21,20 @@
 
         /* --- SCOREBOARD --- */
         #scoreboard {
-            display: flex; justify-content: space-between; padding: 15px 40px;
+            display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
             background: rgba(0,0,0,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10;
         }
         .team-box {
-            text-align: center; background: white; color: #333; padding: 5px 30px;
-            border-radius: 15px; min-width: 120px; box-shadow: 0 4px 0 #bdc3c7;
+            text-align: center; background: white; color: #333; padding: 5px 20px;
+            border-radius: 15px; min-width: 100px; box-shadow: 0 4px 0 #bdc3c7;
+            position: relative;
         }
-        .team-label { font-size: 1em; font-weight: bold; opacity: 0.7; }
-        .team-score { font-family: 'Fredoka One'; font-size: 2.5em; line-height: 1; }
+        .team-label { font-size: 0.9em; font-weight: bold; opacity: 0.7; }
+        .team-score { font-family: 'Fredoka One'; font-size: 2.2em; line-height: 1; }
+        
         #s-boys { color: #3498db; }
         #s-girls { color: #ff6b81; }
+        #s-teacher { color: #8e44ad; border: 2px solid #8e44ad; } 
 
         /* --- GAME AREA --- */
         #game-area {
@@ -43,9 +46,9 @@
         #scenario-box {
             background: white; color: #2c3e50; padding: 30px 40px;
             border-radius: 20px; font-size: 2em; font-weight: bold;
-            text-align: center; max-width: 800px; margin-bottom: 40px;
+            text-align: center; max-width: 900px; margin-bottom: 30px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-bottom: 8px solid #bdc3c7;
-            min-height: 100px; display: flex; align-items: center; justify-content: center;
+            min-height: 120px; display: flex; align-items: center; justify-content: center;
         }
 
         /* --- OPTIONS CONTAINER --- */
@@ -55,9 +58,9 @@
 
         .option-btn {
             background: rgba(255,255,255,0.2); border: 4px solid white;
-            padding: 20px 40px; font-family: 'Fredoka One'; font-size: 2em;
+            padding: 20px 30px; font-family: 'Fredoka One'; font-size: 1.8em;
             color: white; border-radius: 20px; cursor: pointer;
-            transition: transform 0.1s, background 0.2s; min-width: 250px;
+            transition: transform 0.1s, background 0.2s; min-width: 220px;
             box-shadow: 0 8px 0 rgba(0,0,0,0.2);
         }
         .option-btn:hover { background: white; color: #16a085; transform: translateY(-3px); }
@@ -89,7 +92,6 @@
         }
         .btn-large:hover { transform: scale(1.05); }
 
-        /* --- ANIMATIONS --- */
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* --- SETTINGS --- */
@@ -110,10 +112,23 @@
             padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;
             margin: 0 5px;
         }
+        
+        /* --- EXIT BUTTON --- */
+        .btn-exit {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,0,0,0.3); color: white;
+            border: 2px solid rgba(255,255,255,0.5);
+            font-size: 1em; padding: 10px 20px;
+            border-radius: 30px; cursor: pointer;
+            z-index: 200;
+        }
+        .btn-exit:hover { background: #e74c3c; border-color: #e74c3c; }
 
     </style>
 </head>
 <body>
+
+    <button class="btn-exit" onclick="location.href='index.html'">EXIT 🏠</button>
 
     <div id="start-screen" class="overlay">
         <h1 style="font-family: 'Fredoka One'; font-size: 5em; color: #f1c40f; margin: 0;">SCENARIO MATCH</h1>
@@ -122,8 +137,8 @@
     </div>
 
     <div id="winner-screen" class="overlay hidden">
-        <h1 id="winner-title" style="font-family: 'Fredoka One'; font-size: 5em;">WINNER!</h1>
-        <div id="winner-score" style="font-size: 2em; margin-bottom: 20px;">0 - 0</div>
+        <h1 id="winner-title" style="font-family: 'Fredoka One'; font-size: 3em;">GAME OVER</h1>
+        <div id="winner-score" style="font-size: 1.5em; margin-bottom: 20px;">Scores</div>
         <button class="btn-large" style="background: #3498db;" onclick="restartGame()">PLAY AGAIN</button>
     </div>
 
@@ -132,10 +147,17 @@
             <div class="team-label">BOYS</div>
             <div id="score-boys" class="team-score">0</div>
         </div>
+        
+        <div class="team-box" style="border-color: #8e44ad;">
+            <div class="team-label" style="color: #8e44ad;">TEACHER</div>
+            <div id="score-teacher" class="team-score" style="color: #8e44ad;">0</div>
+        </div>
+
         <div style="display: flex; align-items: center;">
             <button class="ctrl-btn" onclick="toggleHistory()">📜 LOG</button>
             <button class="ctrl-btn" style="background: #c0392b;" onclick="endGame()">🛑 END</button>
         </div>
+
         <div class="team-box">
             <div class="team-label">GIRLS</div>
             <div id="score-girls" class="team-score">0</div>
@@ -167,9 +189,12 @@
     <div id="point-modal" class="overlay hidden">
         <div class="modal-box">
             <h2 style="color: #27ae60; font-size: 3em; margin:0;">CORRECT!</h2>
-            <p style="font-size: 1.5em; color: #555;">Who answered correctly?</p>
-            <button class="btn-large" style="background: #3498db;" onclick="awardPoint('boys')">BOYS</button>
-            <button class="btn-large" style="background: #ff6b81;" onclick="awardPoint('girls')">GIRLS</button>
+            <p style="font-size: 1.5em; color: #555;">Who won this point?</p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn-large" style="background: #3498db;" onclick="awardPoint('boys')">BOYS</button>
+                <button class="btn-large" style="background: #8e44ad;" onclick="awardPoint('teacher')">TEACHER</button>
+                <button class="btn-large" style="background: #ff6b81;" onclick="awardPoint('girls')">GIRLS</button>
+            </div>
         </div>
     </div>
 
@@ -182,7 +207,6 @@
     </div>
 
     <script>
-        // --- MASSIVE SCENARIO DATABASE ---
         const data = {
             easy: [
                 { q: "Water falls from the sky and makes everything wet.", a: "RAIN", o: ["SUN", "RAIN", "WIND"] },
@@ -196,7 +220,45 @@
                 { q: "The opposite of Big.", a: "SMALL", o: ["TALL", "SMALL", "FAST"] },
                 { q: "You use this to brush your teeth.", a: "TOOTHBRUSH", o: ["SPOON", "COMB", "TOOTHBRUSH"] },
                 { q: "This color is the same as the grass.", a: "GREEN", o: ["RED", "BLUE", "GREEN"] },
-                { q: "You drink this when you are thirsty.", a: "WATER", o: ["BREAD", "WATER", "PIZZA"] }
+                { q: "You drink this when you are thirsty.", a: "WATER", o: ["BREAD", "WATER", "PIZZA"] },
+                { q: "A fruit that is long, yellow, and monkeys love it.", a: "BANANA", o: ["APPLE", "BANANA", "GRAPE"] },
+                { q: "You use this to cut your food.", a: "KNIFE", o: ["SPOON", "KNIFE", "FORK"] },
+                { q: "A large animal with a long trunk.", a: "ELEPHANT", o: ["LION", "ELEPHANT", "TIGER"] },
+                { q: "You put this on your head to keep warm.", a: "HAT", o: ["SHOE", "HAT", "GLOVE"] },
+                { q: "A vehicle with two wheels that you pedal.", a: "BICYCLE", o: ["CAR", "BUS", "BICYCLE"] },
+                { q: "The meal you eat in the morning.", a: "BREAKFAST", o: ["LUNCH", "DINNER", "BREAKFAST"] },
+                { q: "This animal barks and chases balls.", a: "DOG", o: ["CAT", "DOG", "BIRD"] },
+                { q: "You open this to walk into a room.", a: "DOOR", o: ["WINDOW", "FLOOR", "DOOR"] },
+                { q: "White, cold stuff that falls in winter.", a: "SNOW", o: ["RAIN", "SNOW", "SAND"] },
+                { q: "You sit on this.", a: "CHAIR", o: ["TABLE", "CHAIR", "WALL"] },
+                { q: "A bird that swims and says 'Quack'.", a: "DUCK", o: ["CHICKEN", "DUCK", "COW"] },
+                { q: "You use this to write on paper.", a: "PEN", o: ["BOOK", "PEN", "ERASER"] },
+                { q: "The color of the sky on a sunny day.", a: "BLUE", o: ["RED", "BLUE", "GREEN"] },
+                { q: "You have five of these on each hand.", a: "FINGERS", o: ["TOES", "FINGERS", "LEGS"] },
+                { q: "A very tall animal with a long neck.", a: "GIRAFFE", o: ["ZEBRA", "GIRAFFE", "HORSE"] },
+                { q: "You sleep in this at night.", a: "BED", o: ["DESK", "BED", "CHAIR"] },
+                { q: "This comes out at night and shines.", a: "MOON", o: ["SUN", "MOON", "CLOUD"] },
+                { q: "You wash your hands with this.", a: "SOAP", o: ["SOAP", "PAPER", "PEN"] },
+                { q: "A place where you buy food.", a: "MARKET", o: ["SCHOOL", "MARKET", "HOSPITAL"] },
+                { q: "This has pages and you read it.", a: "BOOK", o: ["PHONE", "BOOK", "PLATE"] },
+                { q: "The opposite of Up.", a: "DOWN", o: ["LEFT", "RIGHT", "DOWN"] },
+                { q: "An animal that gives us milk.", a: "COW", o: ["DOG", "COW", "CAT"] },
+                { q: "You use this to watch cartoons.", a: "TV", o: ["RADIO", "TV", "BOOK"] },
+                { q: "A sweet treat made of cocoa.", a: "CHOCOLATE", o: ["BREAD", "CHOCOLATE", "RICE"] },
+                { q: "The opposite of Hot.", a: "COLD", o: ["WARM", "COLD", "WET"] },
+                { q: "You wear this around your neck when it's cold.", a: "SCARF", o: ["HAT", "SCARF", "SHIRT"] },
+                { q: "A round toy you can kick or throw.", a: "BALL", o: ["BOX", "BALL", "DOLL"] },
+                { q: "The day after today.", a: "TOMORROW", o: ["YESTERDAY", "TOMORROW", "NOW"] },
+                { q: "This helps you see in the dark.", a: "LIGHT", o: ["DARK", "LIGHT", "NOISE"] },
+                { q: "A very slow animal with a shell.", a: "TURTLE", o: ["RABBIT", "TURTLE", "CAT"] },
+                { q: "You use these to hear sounds.", a: "EARS", o: ["EYES", "EARS", "NOSE"] },
+                { q: "A red fruit that keeps the doctor away.", a: "APPLE", o: ["ORANGE", "APPLE", "PEAR"] },
+                { q: "The number after nine.", a: "TEN", o: ["EIGHT", "TEN", "SIX"] },
+                { q: "You wear this on your wrist to tell time.", a: "WATCH", o: ["CLOCK", "WATCH", "RING"] },
+                { q: "A person who puts out fires.", a: "FIREFIGHTER", o: ["DOCTOR", "FIREFIGHTER", "TEACHER"] },
+                { q: "The opposite of Fast.", a: "SLOW", o: ["QUICK", "SLOW", "HARD"] },
+                { q: "Something you open when it rains.", a: "UMBRELLA", o: ["COAT", "UMBRELLA", "BOOTS"] },
+                { q: "The color of a strawberry.", a: "RED", o: ["BLUE", "RED", "YELLOW"] }
             ],
             medium: [
                 { q: "A place where you can borrow books but must be quiet.", a: "LIBRARY", o: ["MARKET", "LIBRARY", "GYM"] },
@@ -210,7 +272,45 @@
                 { q: "You do this when you hear a funny joke.", a: "LAUGH", o: ["CRY", "SCREAM", "LAUGH"] },
                 { q: "A sweet food made by bees.", a: "HONEY", o: ["SUGAR", "HONEY", "JAM"] },
                 { q: "The time of day when the stars come out.", a: "NIGHT", o: ["MORNING", "NOON", "NIGHT"] },
-                { q: "Something you hold over your head when it rains.", a: "UMBRELLA", o: ["HAT", "UMBRELLA", "COAT"] }
+                { q: "Something you hold over your head when it rains.", a: "UMBRELLA", o: ["HAT", "UMBRELLA", "COAT"] },
+                { q: "A doctor who takes care of your teeth.", a: "DENTIST", o: ["VET", "DENTIST", "NURSE"] },
+                { q: "A place where you go to watch a movie.", a: "CINEMA", o: ["PARK", "CINEMA", "SCHOOL"] },
+                { q: "An instrument with black and white keys.", a: "PIANO", o: ["GUITAR", "DRUM", "PIANO"] },
+                { q: "A detailed drawing of a country or city.", a: "MAP", o: ["FLAG", "MAP", "BOOK"] },
+                { q: "A small house made of ice.", a: "IGLOO", o: ["CASTLE", "TENT", "IGLOO"] },
+                { q: "You wear these on your hands in winter.", a: "GLOVES", o: ["SOCKS", "GLOVES", "SCARF"] },
+                { q: "A strong storm with wind and lightning.", a: "THUNDERSTORM", o: ["BREEZE", "THUNDERSTORM", "FOG"] },
+                { q: "The liquid that comes from a volcano.", a: "LAVA", o: ["WATER", "LAVA", "MUD"] },
+                { q: "A person who puts out fires.", a: "FIREFIGHTER", o: ["POLICE", "FIREFIGHTER", "DOCTOR"] },
+                { q: "The planet we live on.", a: "EARTH", o: ["MARS", "EARTH", "MOON"] },
+                { q: "A structure that bridges across a river.", a: "BRIDGE", o: ["ROAD", "BRIDGE", "TUNNEL"] },
+                { q: "A piece of jewelry worn around the neck.", a: "NECKLACE", o: ["RING", "NECKLACE", "WATCH"] },
+                { q: "The hard part of your body inside your fingers.", a: "BONE", o: ["SKIN", "BONE", "HAIR"] },
+                { q: "A large boat that travels across the ocean.", a: "SHIP", o: ["BOAT", "SHIP", "CANOE"] },
+                { q: "You use this to take photos.", a: "CAMERA", o: ["PHONE", "CAMERA", "RADIO"] },
+                { q: "A person who plays a musical instrument.", a: "MUSICIAN", o: ["ACTOR", "MUSICIAN", "DANCER"] },
+                { q: "The opposite of interesting.", a: "BORING", o: ["FUN", "BORING", "HAPPY"] },
+                { q: "A place where you can see many animals.", a: "ZOO", o: ["FARM", "ZOO", "JUNGLE"] },
+                { q: "The study of numbers.", a: "MATH", o: ["ENGLISH", "MATH", "SCIENCE"] },
+                { q: "You use this to measure how long something is.", a: "RULER", o: ["PEN", "RULER", "SCISSORS"] },
+                { q: "A group of people playing a game together.", a: "TEAM", o: ["CLASS", "TEAM", "FAMILY"] },
+                { q: "The son of a king and queen.", a: "PRINCE", o: ["PRINCESS", "KING", "PRINCE"] },
+                { q: "A sudden shaking of the ground.", a: "EARTHQUAKE", o: ["STORM", "EARTHQUAKE", "FLOOD"] },
+                { q: "The hair that grows on a man's face.", a: "BEARD", o: ["HAIR", "BEARD", "EYEBROW"] },
+                { q: "A round vegetable that makes you cry when cut.", a: "ONION", o: ["POTATO", "ONION", "CARROT"] },
+                { q: "You put this in a car to make it go.", a: "FUEL", o: ["WATER", "FUEL", "AIR"] },
+                { q: "A person who serves food in a restaurant.", a: "WAITER", o: ["CHEF", "WAITER", "MANAGER"] },
+                { q: "The middle of the day.", a: "NOON", o: ["MIDNIGHT", "NOON", "MORNING"] },
+                { q: "A building where criminals are kept.", a: "PRISON", o: ["HOSPITAL", "PRISON", "SCHOOL"] },
+                { q: "The opposite of expensive.", a: "CHEAP", o: ["RICH", "CHEAP", "FREE"] },
+                { q: "A machine that cleans your clothes.", a: "WASHER", o: ["DRYER", "WASHER", "FRIDGE"] },
+                { q: "The season when leaves fall from trees.", a: "AUTUMN", o: ["SPRING", "AUTUMN", "WINTER"] },
+                { q: "A very large hill.", a: "MOUNTAIN", o: ["HILL", "MOUNTAIN", "VALLEY"] },
+                { q: "You use this to type on a computer.", a: "KEYBOARD", o: ["MOUSE", "KEYBOARD", "SCREEN"] },
+                { q: "A person who catches criminals.", a: "POLICE", o: ["LAWYER", "POLICE", "JUDGE"] },
+                { q: "The loud noise you hear during a storm.", a: "THUNDER", o: ["LIGHTNING", "THUNDER", "RAIN"] },
+                { q: "A long journey by sea.", a: "VOYAGE", o: ["TRIP", "VOYAGE", "WALK"] },
+                { q: "The yellow part of an egg.", a: "YOLK", o: ["SHELL", "YOLK", "WHITE"] }
             ],
             hard: [
                 { q: "A feeling of being very afraid or scared.", a: "TERRIFIED", o: ["BORED", "TERRIFIED", "EXCITED"] },
@@ -224,13 +324,170 @@
                 { q: "A book where you write your daily thoughts.", a: "DIARY", o: ["DICTIONARY", "DIARY", "ATLAS"] },
                 { q: "The measurement of how hot or cold something is.", a: "TEMPERATURE", o: ["WEIGHT", "LENGTH", "TEMPERATURE"] },
                 { q: "Someone who travels to space.", a: "ASTRONAUT", o: ["SCIENTIST", "ASTRONAUT", "PILOT"] },
-                { q: "An instrument used to find direction (North, South).", a: "COMPASS", o: ["CLOCK", "COMPASS", "RULER"] }
+                { q: "An instrument used to find direction (North, South).", a: "COMPASS", o: ["CLOCK", "COMPASS", "RULER"] },
+                { q: "A written account of someone's life written by someone else.", a: "BIOGRAPHY", o: ["AUTOBIOGRAPHY", "BIOGRAPHY", "NOVEL"] },
+                { q: "To forgive someone for a mistake.", a: "PARDON", o: ["PUNISH", "PARDON", "BLAME"] },
+                { q: "A large group of musicians playing together.", a: "ORCHESTRA", o: ["BAND", "ORCHESTRA", "CHOIR"] },
+                { q: "The study of stars and planets.", a: "ASTRONOMY", o: ["GEOLOGY", "BIOLOGY", "ASTRONOMY"] },
+                { q: "A building where historical objects are kept.", a: "MUSEUM", o: ["LIBRARY", "MUSEUM", "GALLERY"] },
+                { q: "To predict what will happen in the future.", a: "FORECAST", o: ["REMEMBER", "FORECAST", "IGNORE"] },
+                { q: "A person who draws plans for buildings.", a: "ARCHITECT", o: ["BUILDER", "ARCHITECT", "ENGINEER"] },
+                { q: "Something that catches fire easily.", a: "FLAMMABLE", o: ["WATERPROOF", "FLAMMABLE", "HEAVY"] },
+                { q: "A shortage of food in a region.", a: "FAMINE", o: ["DROUGHT", "FAMINE", "FLOOD"] },
+                { q: "To make something larger or closer.", a: "MAGNIFY", o: ["SHRINK", "MAGNIFY", "HIDE"] },
+                { q: "A vehicle that travels underwater.", a: "SUBMARINE", o: ["SHIP", "SUBMARINE", "BOAT"] },
+                { q: "The feeling of wanting what someone else has.", a: "JEALOUSY", o: ["JOY", "JEALOUSY", "PRIDE"] },
+                { q: "To look at something very closely.", a: "EXAMINE", o: ["GLANCE", "EXAMINE", "IGNORE"] },
+                { q: "A substance used to cure an illness.", a: "REMEDY", o: ["POISON", "REMEDY", "CANDY"] },
+                { q: "A person who is running away from the law.", a: "FUGITIVE", o: ["POLICE", "FUGITIVE", "JUDGE"] },
+                { q: "A very strong wind storm that spins.", a: "TORNADO", o: ["RAIN", "TORNADO", "FOG"] },
+                { q: "The top of a mountain.", a: "SUMMIT", o: ["BASE", "SUMMIT", "SLOPE"] },
+                { q: "A person who writes books.", a: "AUTHOR", o: ["READER", "AUTHOR", "EDITOR"] },
+                { q: "To take something without asking.", a: "STEAL", o: ["BORROW", "STEAL", "GIVE"] },
+                { q: "The scientific study of life.", a: "BIOLOGY", o: ["CHEMISTRY", "BIOLOGY", "PHYSICS"] },
+                { q: "A feeling of great happiness.", a: "JOY", o: ["SADNESS", "JOY", "ANGER"] },
+                { q: "To talk very quietly.", a: "WHISPER", o: ["SHOUT", "WHISPER", "SING"] },
+                { q: "A list of food options at a restaurant.", a: "MENU", o: ["RECIPE", "MENU", "BILL"] },
+                { q: "A person who travels for pleasure.", a: "TOURIST", o: ["LOCAL", "TOURIST", "GUIDE"] },
+                { q: "The process of voting for a leader.", a: "ELECTION", o: ["WAR", "ELECTION", "DEBATE"] },
+                { q: "A large body of saltwater.", a: "OCEAN", o: ["RIVER", "LAKE", "OCEAN"] },
+                { q: "To find the answer to a math problem.", a: "SOLVE", o: ["WRITE", "SOLVE", "GUESS"] },
+                { q: "A person who helps a doctor.", a: "NURSE", o: ["PATIENT", "NURSE", "SURGEON"] },
+                { q: "To stop working because of age.", a: "RETIRE", o: ["WORK", "RETIRE", "PLAY"] },
+                { q: "The hard shell of a turtle.", a: "CARAPACE", o: ["SKIN", "CARAPACE", "FUR"] },
+                { q: "A person who goes to space.", a: "COSMONAUT", o: ["PILOT", "COSMONAUT", "DRIVER"] },
+                { q: "To make something better.", a: "IMPROVE", o: ["BREAK", "IMPROVE", "IGNORE"] },
+                { q: "A story that is not true.", a: "FICTION", o: ["FACT", "FICTION", "NEWS"] },
+                { q: "A document allowing you to travel abroad.", a: "PASSPORT", o: ["TICKET", "PASSPORT", "MAP"] },
+                { q: "The skeleton of a head.", a: "SKULL", o: ["BONE", "SKULL", "RIB"] },
+                { q: "To tremble from cold or fear.", a: "SHIVER", o: ["SWEAT", "SHIVER", "SMILE"] },
+                { q: "A place where scientific experiments are done.", a: "LABORATORY", o: ["FACTORY", "LABORATORY", "OFFICE"] },
+                { q: "The main city of a country.", a: "CAPITAL", o: ["VILLAGE", "CAPITAL", "TOWN"] },
+                { q: "A complete change of form (like a caterpillar to a butterfly).", a: "METAMORPHOSIS", o: ["EVOLUTION", "METAMORPHOSIS", "GROWTH"] },
+                { q: "To delay doing something until later.", a: "PROCRASTINATE", o: ["HURRY", "PROCRASTINATE", "COMPLETE"] },
+                { q: "Something that has more than one meaning.", a: "AMBIGUOUS", o: ["CLEAR", "AMBIGUOUS", "SIMPLE"] },
+                { q: "Kind and helpful.", a: "BENEVOLENT", o: ["CRUEL", "BENEVOLENT", "GREEDY"] },
+                { q: "Certain to happen; unavoidable.", a: "INEVITABLE", o: ["IMPOSSIBLE", "INEVITABLE", "LIKELY"] },
+                { q: "An educated guess to be tested.", a: "HYPOTHESIS", o: ["FACT", "HYPOTHESIS", "LAW"] },
+                { q: "To work together on a project.", a: "COLLABORATE", o: ["COMPETE", "COLLABORATE", "IGNORE"] },
+                { q: "Easy to see through.", a: "TRANSPARENT", o: ["OPAQUE", "TRANSPARENT", "DARK"] },
+                { q: "Something that blocks your way.", a: "OBSTACLE", o: ["PATH", "OBSTACLE", "BRIDGE"] },
+                { q: "A physical sign of an illness.", a: "SYMPTOM", o: ["CURE", "SYMPTOM", "DOCTOR"] },
+                { q: "Government by the people.", a: "DEMOCRACY", o: ["MONARCHY", "DEMOCRACY", "ANARCHY"] },
+                { q: "Government by a king or queen.", a: "MONARCHY", o: ["DEMOCRACY", "MONARCHY", "REPUBLIC"] },
+                { q: "A period of 100 years.", a: "CENTURY", o: ["DECADE", "CENTURY", "MILLENNIUM"] },
+                { q: "A period of 1000 years.", a: "MILLENNIUM", o: ["CENTURY", "MILLENNIUM", "ERA"] },
+                { q: "No longer existing (like dinosaurs).", a: "EXTINCT", o: ["ALIVE", "EXTINCT", "COMMON"] },
+                { q: "Harmful substances in the air or water.", a: "POLLUTION", o: ["NATURE", "POLLUTION", "PURITY"] },
+                { q: "The natural world around us.", a: "ENVIRONMENT", o: ["CITY", "ENVIRONMENT", "SPACE"] },
+                { q: "Energy that can be used again (like solar).", a: "RENEWABLE", o: ["FOSSIL", "RENEWABLE", "LIMITED"] },
+                { q: "A mass of snow sliding down a mountain.", a: "AVALANCHE", o: ["FLOOD", "AVALANCHE", "STORM"] },
+                { q: "A giant ocean wave caused by an earthquake.", a: "TSUNAMI", o: ["TIDE", "TSUNAMI", "RIPPLE"] },
+                { q: "A long period with no rain.", a: "DROUGHT", o: ["FLOOD", "DROUGHT", "STORM"] },
+                { q: "A widespread outbreak of a disease.", a: "EPIDEMIC", o: ["COLD", "EPIDEMIC", "INJURY"] },
+                { q: "A substance to prevent disease.", a: "VACCINE", o: ["POISON", "VACCINE", "VIRUS"] },
+                { q: "Medicine that kills bacteria.", a: "ANTIBIOTIC", o: ["VITAMIN", "ANTIBIOTIC", "ASPIRIN"] },
+                { q: "A doctor who performs operations.", a: "SURGEON", o: ["NURSE", "SURGEON", "DENTIST"] },
+                { q: "A person who designs buildings.", a: "ARCHITECT", o: ["BUILDER", "ARCHITECT", "PAINTER"] },
+                { q: "A general increase in prices.", a: "INFLATION", o: ["DISCOUNT", "INFLATION", "SALE"] },
+                { q: "A plan for spending money.", a: "BUDGET", o: ["DEBT", "BUDGET", "LOAN"] },
+                { q: "Money used to make more money.", a: "INVESTMENT", o: ["SPENDING", "INVESTMENT", "LOSS"] },
+                { q: "To discuss to reach an agreement.", a: "NEGOTIATE", o: ["ARGUE", "NEGOTIATE", "FIGHT"] },
+                { q: "An agreement where both sides give up something.", a: "COMPROMISE", o: ["VICTORY", "COMPROMISE", "DEFEAT"] },
+                { q: "A serious disagreement or argument.", a: "CONFLICT", o: ["PEACE", "CONFLICT", "ACCORD"] },
+                { q: "Fairness in the way people are treated.", a: "JUSTICE", o: ["CRIME", "JUSTICE", "BIAS"] },
+                { q: "The state of being free.", a: "LIBERTY", o: ["PRISON", "LIBERTY", "RULE"] },
+                { q: "The state of being equal.", a: "EQUALITY", o: ["DIFFERENCE", "EQUALITY", "LEVEL"] },
+                { q: "Traditions passed down from the past.", a: "HERITAGE", o: ["FUTURE", "HERITAGE", "NEWS"] },
+                { q: "A relative who lived a long time ago.", a: "ANCESTOR", o: ["DESCENDANT", "ANCESTOR", "FRIEND"] },
+                { q: "Movement from one place to another.", a: "MIGRATION", o: ["STAYING", "MIGRATION", "SLEEP"] },
+                { q: "A person forced to leave their country.", a: "REFUGEE", o: ["TOURIST", "REFUGEE", "CITIZEN"] },
+                { q: "A person who works for free.", a: "VOLUNTEER", o: ["EMPLOYEE", "VOLUNTEER", "BOSS"] },
+                { q: "An organization to help those in need.", a: "CHARITY", o: ["BUSINESS", "CHARITY", "BANK"] },
+                { q: "Willing to give more than is expected.", a: "GENEROUS", o: ["STINGY", "GENEROUS", "POOR"] },
+                { q: "Having too much pride in oneself.", a: "ARROGANT", o: ["HUMBLE", "ARROGANT", "SHY"] },
+                { q: "Not proud; modest.", a: "HUMBLE", o: ["ARROGANT", "HUMBLE", "LOUD"] },
+                { q: "Hopeful about the future.", a: "OPTIMISTIC", o: ["PESSIMISTIC", "OPTIMISTIC", "SAD"] },
+                { q: "Expecting the worst to happen.", a: "PESSIMISTIC", o: ["OPTIMISTIC", "PESSIMISTIC", "HAPPY"] },
+                { q: "Using irony to mock or convey contempt.", a: "SARCASTIC", o: ["SERIOUS", "SARCASTIC", "KIND"] },
+                { q: "The opposite of what is expected.", a: "IRONY", o: ["TRUTH", "IRONY", "LIE"] },
+                { q: "The most exciting point in a story.", a: "CLIMAX", o: ["START", "CLIMAX", "END"] },
+                { q: "The main character in a story.", a: "PROTAGONIST", o: ["VILLAIN", "PROTAGONIST", "EXTRA"] },
+                { q: "The character who opposes the hero.", a: "ANTAGONIST", o: ["HERO", "ANTAGONIST", "FRIEND"] },
+                { q: "Conversation between characters.", a: "DIALOGUE", o: ["SILENCE", "DIALOGUE", "THOUGHT"] },
+                { q: "A list of books used in a report.", a: "BIBLIOGRAPHY", o: ["STORY", "BIBLIOGRAPHY", "INDEX"] },
+                { q: "Copying someone else's work.", a: "PLAGIARISM", o: ["CREATING", "PLAGIARISM", "WRITING"] },
+                { q: "Legal right to print/publish.", a: "COPYRIGHT", o: ["COPY", "COPYRIGHT", "STEAL"] },
+                { q: "A short, memorable phrase.", a: "SLOGAN", o: ["SPEECH", "SLOGAN", "BOOK"] },
+                { q: "A person who buys goods.", a: "CONSUMER", o: ["SELLER", "CONSUMER", "MAKER"] },
+                { q: "The amount of goods available.", a: "SUPPLY", o: ["DEMAND", "SUPPLY", "NEED"] },
+                { q: "Goods brought into a country.", a: "IMPORT", o: ["EXPORT", "IMPORT", "MAKE"] },
+                { q: "Goods sent out of a country.", a: "EXPORT", o: ["IMPORT", "EXPORT", "BUY"] },
+                { q: "A tax on imported goods.", a: "TARIFF", o: ["PRICE", "TARIFF", "GIFT"] },
+                { q: "A formal agreement between countries.", a: "TREATY", o: ["WAR", "TREATY", "FIGHT"] },
+                { q: "A union formed for mutual benefit.", a: "ALLIANCE", o: ["ENEMY", "ALLIANCE", "SOLO"] },
+                { q: "Not taking sides in a conflict.", a: "NEUTRAL", o: ["BIASED", "NEUTRAL", "PARTNER"] },
+                { q: "Information used to promote a cause.", a: "PROPAGANDA", o: ["NEWS", "PROPAGANDA", "FACT"] },
+                { q: "Suppressing speech or writing.", a: "CENSORSHIP", o: ["FREEDOM", "CENSORSHIP", "SPEECH"] },
+                { q: "A widely held but fixed image of a group.", a: "STEREOTYPE", o: ["FACT", "STEREOTYPE", "TRUTH"] },
+                { q: "Interaction among people/companies worldwide.", a: "GLOBALIZATION", o: ["ISOLATION", "GLOBALIZATION", "LOCAL"] },
+                { q: "Relating to a city or town.", a: "URBAN", o: ["RURAL", "URBAN", "WILD"] },
+                { q: "Relating to the countryside.", a: "RURAL", o: ["URBAN", "RURAL", "CITY"] },
+                { q: "All the inhabitants of a place.", a: "POPULATION", o: ["PERSON", "POPULATION", "FAMILY"] },
+                { q: "The state of being extremely poor.", a: "POVERTY", o: ["WEALTH", "POVERTY", "HEALTH"] },
+                { q: "An abundance of valuable possessions.", a: "WEALTH", o: ["POVERTY", "WEALTH", "DEBT"] },
+                { q: "Unable to pay debts.", a: "BANKRUPTCY", o: ["PROFIT", "BANKRUPTCY", "SAVING"] },
+                { q: "Exclusive control of a commodity.", a: "MONOPOLY", o: ["MARKET", "MONOPOLY", "SHARE"] },
+                { q: "A new method, idea, or product.", a: "INNOVATION", o: ["OLD", "INNOVATION", "COPY"] },
+                { q: "Intelligence demonstrated by machines.", a: "AI", o: ["HUMAN", "AI", "ANIMAL"] },
+                { q: "A set of rules for calculations.", a: "ALGORITHM", o: ["GUESS", "ALGORITHM", "CHAOS"] },
+                { q: "Encoding data for security.", a: "ENCRYPTION", o: ["OPEN", "ENCRYPTION", "TEXT"] },
+                { q: "Code capable of copying itself to damage computers.", a: "VIRUS", o: ["PROGRAM", "VIRUS", "APP"] },
+                { q: "An organized collection of data.", a: "DATABASE", o: ["LIST", "DATABASE", "PILE"] },
+                { q: "Two or more computers connected.", a: "NETWORK", o: ["SOLO", "NETWORK", "WIRE"] },
+                { q: "Physical parts of a computer.", a: "HARDWARE", o: ["SOFTWARE", "HARDWARE", "DATA"] },
+                { q: "Programs used by a computer.", a: "SOFTWARE", o: ["HARDWARE", "SOFTWARE", "SCREEN"] },
+                { q: "Moral principles governing behavior.", a: "ETHICS", o: ["LAW", "ETHICS", "CRIME"] },
+                { q: "The study of fundamental nature of knowledge.", a: "PHILOSOPHY", o: ["SCIENCE", "PHILOSOPHY", "ART"] },
+                { q: "Reasoning conducted according to principles.", a: "LOGIC", o: ["EMOTION", "LOGIC", "GUESS"] },
+                { q: "An innate, typically fixed pattern of behavior.", a: "INSTINCT", o: ["LEARNING", "INSTINCT", "CHOICE"] },
+                { q: "The state of being awake and aware.", a: "CONSCIOUSNESS", o: ["SLEEP", "CONSCIOUSNESS", "COMA"] },
+                { q: "Seeing something that is not there.", a: "HALLUCINATION", o: ["REALITY", "HALLUCINATION", "SIGHT"] },
+                { q: "A false idea or belief.", a: "ILLUSION", o: ["TRUTH", "ILLUSION", "FACT"] },
+                { q: "Loss of memories.", a: "AMNESIA", o: ["MEMORY", "AMNESIA", "RECALL"] },
+                { q: "Sentimental longing for the past.", a: "NOSTALGIA", o: ["FUTURE", "NOSTALGIA", "HOPE"] },
+                { q: "Feeling of having experienced something before.", a: "DEJAVU", o: ["NEW", "DEJAVU", "SHOCK"] },
+                { q: "A statement that contradicts itself.", a: "PARADOX", o: ["FACT", "PARADOX", "TRUTH"] },
+                { q: "A difficult choice between two options.", a: "DILEMMA", o: ["CHOICE", "DILEMMA", "ANSWER"] },
+                { q: "A complicated irregular network of passages.", a: "LABYRINTH", o: ["PATH", "LABYRINTH", "ROAD"] },
+                { q: "Complete disorder and confusion.", a: "CHAOS", o: ["ORDER", "CHAOS", "PEACE"] },
+                { q: "A forcible overthrow of a government.", a: "REVOLUTION", o: ["PEACE", "REVOLUTION", "VOTE"] },
+                { q: "The crime of betraying one's country.", a: "TREASON", o: ["LOYALTY", "TREASON", "DUTY"] },
+                { q: "The practice of spying.", a: "ESPIONAGE", o: ["WAR", "ESPIONAGE", "TRUST"] },
+                { q: "Managing international relations.", a: "DIPLOMACY", o: ["WAR", "DIPLOMACY", "FIGHT"] },
+                { q: "An official representative of a country.", a: "AMBASSADOR", o: ["TOURIST", "AMBASSADOR", "SPY"] },
+                { q: "A planned route or journey.", a: "ITINERARY", o: ["MAP", "ITINERARY", "TICKET"] },
+                { q: "A journey undertaken by a group.", a: "EXPEDITION", o: ["WALK", "EXPEDITION", "TRIP"] },
+                { q: "Finding something unexpected.", a: "DISCOVERY", o: ["LOSS", "DISCOVERY", "SEARCH"] },
+                { q: "Creating something new.", a: "INVENTION", o: ["COPY", "INVENTION", "FIND"] },
+                { q: "The use of imagination to create.", a: "CREATIVITY", o: ["WORK", "CREATIVITY", "LOGIC"] },
+                { q: "A strong desire to achieve something.", a: "AMBITION", o: ["LAZINESS", "AMBITION", "WISH"] },
+                { q: "The process of developing different kinds of organisms.", a: "EVOLUTION", o: ["CHANGE", "EVOLUTION", "STASIS"] },
+                { q: "Becoming adjusted to new conditions.", a: "ADAPTATION", o: ["FAILURE", "ADAPTATION", "DEATH"] },
+                { q: "The remains of a prehistoric organism.", a: "FOSSIL", o: ["BONE", "FOSSIL", "ROCK"] },
+                { q: "The study of human history via artifacts.", a: "ARCHAEOLOGY", o: ["HISTORY", "ARCHAEOLOGY", "MATH"] },
+                { q: "The study of society.", a: "SOCIOLOGY", o: ["BIOLOGY", "SOCIOLOGY", "CIVICS"] },
+                { q: "The study of the human mind.", a: "PSYCHOLOGY", o: ["BODY", "PSYCHOLOGY", "BRAIN"] },
+                { q: "Scientific tests used to detect crime.", a: "FORENSICS", o: ["POLICE", "FORENSICS", "LAW"] },
+                { q: "A written or spoken agreement.", a: "CONTRACT", o: ["PROMISE", "CONTRACT", "WORD"] },
+                { q: "A strong feeling of support.", a: "LOYALTY", o: ["HATE", "LOYALTY", "FEAR"] },
+                { q: "Wrongful or criminal deception.", a: "FRAUD", o: ["TRUTH", "FRAUD", "HELP"] }
             ]
         };
 
         let currentDiff = 'easy';
         let currentScenario = {};
-        let scores = { boys: 0, girls: 0 };
+        let scores = { boys: 0, girls: 0, teacher: 0 };
         let timerInterval;
         let timeLeft = 30;
 
@@ -295,9 +552,12 @@
             if (team === 'boys') {
                 scores.boys++;
                 document.getElementById('score-boys').innerText = scores.boys;
-            } else {
+            } else if (team === 'girls') {
                 scores.girls++;
                 document.getElementById('score-girls').innerText = scores.girls;
+            } else {
+                scores.teacher++;
+                document.getElementById('score-teacher').innerText = scores.teacher;
             }
             document.getElementById('point-modal').classList.add('hidden');
             nextRound();
@@ -331,25 +591,28 @@
             clearInterval(timerInterval);
             saveHistory();
             document.getElementById('winner-screen').classList.remove('hidden');
-            document.getElementById('winner-score').innerText = `BOYS ${scores.boys} - ${scores.girls} GIRLS`;
+            document.getElementById('winner-score').innerText = `BOYS: ${scores.boys} | GIRLS: ${scores.girls} | TEACHER: ${scores.teacher}`;
             
             const title = document.getElementById('winner-title');
-            if (scores.boys > scores.girls) { title.innerText = "BOYS WIN!"; title.style.color = "#3498db"; }
-            else if (scores.girls > scores.boys) { title.innerText = "GIRLS WIN!"; title.style.color = "#ff6b81"; }
+            // Determine winner logic including teacher
+            if (scores.boys > scores.girls && scores.boys > scores.teacher) { title.innerText = "BOYS WIN!"; title.style.color = "#3498db"; }
+            else if (scores.girls > scores.boys && scores.girls > scores.teacher) { title.innerText = "GIRLS WIN!"; title.style.color = "#ff6b81"; }
+            else if (scores.teacher > scores.boys && scores.teacher > scores.girls) { title.innerText = "TEACHER WINS!"; title.style.color = "#8e44ad"; }
             else { title.innerText = "DRAW!"; title.style.color = "#f1c40f"; }
         }
 
         function restartGame() {
-            scores = { boys: 0, girls: 0 };
+            scores = { boys: 0, girls: 0, teacher: 0 };
             document.getElementById('score-boys').innerText = '0';
             document.getElementById('score-girls').innerText = '0';
+            document.getElementById('score-teacher').innerText = '0';
             document.getElementById('winner-screen').classList.add('hidden');
             nextRound();
         }
 
         function saveHistory() {
             let hist = JSON.parse(localStorage.getItem('scenarioMatchHistory')) || [];
-            hist.push({ date: new Date().toLocaleTimeString(), b: scores.boys, g: scores.girls });
+            hist.push({ date: new Date().toLocaleTimeString(), b: scores.boys, g: scores.girls, t: scores.teacher });
             localStorage.setItem('scenarioMatchHistory', JSON.stringify(hist));
         }
 
@@ -362,7 +625,7 @@
                 let hist = JSON.parse(localStorage.getItem('scenarioMatchHistory')) || [];
                 hist.slice().reverse().forEach(h => {
                     list.innerHTML += `<div style="background:white; padding:10px; margin:5px; border-radius:5px;">
-                        <b>${h.date}</b>: Boys ${h.b} - ${h.g} Girls
+                        <b>${h.date}</b>: B:${h.b} - G:${h.g} - T:${h.t || 0}
                     </div>`;
                 });
             }
