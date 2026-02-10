@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Trap: TOURNAMENT EDITION</title>
+    <title>Spelling Trap: Final Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
 
@@ -19,223 +19,198 @@
             user-select: none;
         }
 
-        /* --- SCOREBOARD --- */
-        #scoreboard {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px 40px;
-            background: rgba(0,0,0,0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-
-        .team-box {
-            text-align: center;
-            background: white;
-            color: #333;
-            padding: 10px 40px;
-            border-radius: 20px;
-            min-width: 150px;
-            box-shadow: 0 5px 0 #bdc3c7;
-        }
-
-        .team-label { font-size: 1.2em; font-weight: bold; opacity: 0.7; }
-        .team-score { font-family: 'Fredoka One'; font-size: 3em; line-height: 1; }
-        #s-boys { color: #3498db; }
-        #s-girls { color: #ff6b81; }
-
-        /* --- TIMER BAR --- */
-        #timer-container {
-            width: 100%;
-            height: 20px;
-            background: rgba(0,0,0,0.3);
-            position: relative;
-        }
-
-        #timer-bar {
-            height: 100%;
-            width: 100%;
-            background: #2ecc71;
-            transition: width 1s linear, background 0.5s;
-            box-shadow: 0 0 10px #2ecc71;
-        }
-
-        #timer-text {
-            position: absolute;
-            top: 25px; left: 50%; transform: translateX(-50%);
-            font-family: 'Fredoka One'; font-size: 2em;
-            color: white; text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-        }
-
-        /* --- GAME CENTER --- */
-        #game-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #clue-box {
-            background: #f1c40f;
-            color: #2c3e50;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            max-width: 80%;
-            border: 4px solid white;
-        }
-
-        #puzzle-text {
-            font-family: 'Fredoka One';
-            font-size: 5em;
-            letter-spacing: 15px;
-            margin-bottom: 40px;
-            text-shadow: 4px 4px 0 rgba(0,0,0,0.3);
-        }
-
-        /* --- BUTTONS --- */
-        #options-container {
-            display: flex;
-            gap: 40px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .option-btn {
-            background: white;
-            border: none;
-            padding: 20px 40px;
-            font-family: 'Fredoka One';
-            font-size: 2.5em;
-            color: #2c3e50;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            box-shadow: 0 8px 0 #bdc3c7;
-            min-width: 300px;
-            border: 4px solid white;
-        }
-
-        .option-btn:active { transform: translateY(8px); box-shadow: none; }
-        .option-btn:hover { background: #ecf0f1; transform: translateY(-2px); }
-        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* --- CONTROL BUTTONS (Bottom) --- */
-        #controls-bottom {
-            position: absolute; bottom: 20px; width: 100%;
-            display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box;
-        }
-
-        .ctrl-btn {
-            background: rgba(255,255,255,0.2); color: white;
-            border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer;
-            font-weight: bold; font-size: 1.2em; transition: 0.2s;
-            border: 2px solid rgba(255,255,255,0.5);
-        }
-        .ctrl-btn:hover { background: white; color: #333; }
-        #btn-end { background: #c0392b; border-color: #e74c3c; }
-
-        /* --- HISTORY SIDEBAR --- */
-        #history-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0,0,0,0.5); color: white;
-            border: 2px solid white; padding: 10px 20px;
-            border-radius: 20px; cursor: pointer; font-weight: bold;
-            z-index: 300;
-        }
-        #history-btn:hover { background: white; color: #333; }
-
-        #history-overlay {
-            position: absolute; top: 0; right: -400px; width: 350px; height: 100%;
-            background: #ecf0f1; color: #333;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-            z-index: 400; transition: right 0.3s ease;
-            display: flex; flex-direction: column;
-            padding: 20px; box-sizing: border-box;
-        }
-        #history-overlay.open { right: 0; }
-        
-        .history-item {
-            background: white; padding: 15px; margin-bottom: 10px;
-            border-radius: 10px; display: flex; justify-content: space-between;
-            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .b-win { color: #3498db; font-weight: bold; }
-        .g-win { color: #ff6b81; font-weight: bold; }
-        .draw { color: #f1c40f; font-weight: bold; }
-
-        /* --- ANIMATIONS --- */
-        .correct-anim { background: #2ecc71 !important; color: white !important; box-shadow: 0 8px 0 #27ae60 !important; transform: scale(1.1); }
-        .wrong-anim { background: #e74c3c !important; color: white !important; box-shadow: 0 8px 0 #c0392b !important; animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-        /* --- MODALS --- */
+        /* --- OVERLAYS --- */
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 100;
+            background: rgba(0,0,0,0.98); z-index: 500;
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+            transition: opacity 0.5s;
         }
-        .hidden { display: none !important; }
+        
+        .hidden { display: none !important; opacity: 0; pointer-events: none; }
 
-        .modal-box {
-            background: white; padding: 40px; border-radius: 20px; text-align: center;
-            color: #333; border: 8px solid #f1c40f;
+        /* --- RULES SCREEN --- */
+        .rules-box {
+            background: white; color: #333; padding: 40px 60px;
+            border-radius: 30px; text-align: center; border: 8px solid #c0392b;
+            max-width: 80%; animation: popIn 0.5s;
         }
+        .rules-title {
+            font-family: 'Fredoka One'; font-size: clamp(2.5rem, 5vw, 4rem); 
+            color: #c0392b; margin-bottom: 30px; text-transform: uppercase;
+        }
+        .rule-item {
+            font-size: clamp(1.5rem, 3vw, 2.5rem); margin: 20px 0;
+            font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 10px;
+        }
+        .btn-agree {
+            background: #2ecc71; color: white; padding: 20px 50px;
+            font-size: 2em; border: none; border-radius: 50px;
+            font-family: 'Fredoka One'; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 10px 0 #27ae60; transition: transform 0.2s;
+        }
+        .btn-agree:hover { transform: translateY(-5px); }
+
+        /* --- WINNER SCREEN --- */
+        #winner-title {
+            font-family: 'Fredoka One'; font-size: clamp(4rem, 10vw, 8rem);
+            margin-bottom: 20px; text-shadow: 0 10px 0 rgba(0,0,0,0.2);
+            animation: pulse 1s infinite;
+        }
+        #winner-details { font-size: 2.5em; margin-bottom: 40px; font-weight: bold; }
+        .btn-home { background: #3498db; }
+
+        /* --- DIFFICULTY SCREEN --- */
+        .title-large { 
+            font-family: 'Fredoka One'; font-size: clamp(3rem, 6vw, 6rem); 
+            margin-bottom: 30px; color: #f1c40f; text-shadow: 0 5px 0 #c29d0b; text-align: center;
+        }
+        .btn-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 90%; }
+        .level-btn {
+            padding: 2vh 4vw; font-size: clamp(1.5rem, 2.5vw, 2.5rem); 
+            border: none; border-radius: 20px; cursor: pointer; font-family: 'Fredoka One'; color: white;
+            transition: transform 0.2s; min-width: 200px; text-align: center;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+        }
+        .level-btn:hover { transform: translateY(-5px); filter: brightness(1.1); }
+        .btn-easy { background: #2ecc71; }
+        .btn-medium { background: #f39c12; }
+        .btn-hard { background: #e74c3c; }
+
+        /* --- SCOREBOARD --- */
+        #scoreboard {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1vh 2vw; background: rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10;
+        }
+        .team-box {
+            text-align: center; background: white; color: #333;
+            padding: 5px 20px; border-radius: 15px; min-width: 80px;
+            box-shadow: 0 4px 0 #bdc3c7; border: 3px solid transparent;
+        }
+        .team-label { font-size: 0.9em; font-weight: bold; opacity: 0.7; }
+        .team-score { font-family: 'Fredoka One'; font-size: 2.5em; line-height: 1; }
+        #s-boys { color: #3498db; }
+        #s-girls { color: #ff6b81; }
+        #s-teacher { color: #8e44ad; border-color: #8e44ad; }
+
+        /* --- GAME AREA --- */
+        #game-area {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
+        }
+        #clue-box {
+            background: #f1c40f; color: #2c3e50;
+            padding: 2vh 4vw; border-radius: 50px;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: bold; margin-bottom: 2vh;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 4px solid white; max-width: 90%;
+        }
+        #puzzle-text {
+            font-family: 'Fredoka One'; font-size: clamp(3rem, 8vw, 6rem);
+            letter-spacing: 15px; margin-bottom: 3vh;
+            text-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+        }
+        #options-container {
+            display: flex; gap: 20px; width: 90%;
+            justify-content: center; flex-wrap: wrap;
+        }
+        .option-btn {
+            background: white; border: none; padding: 20px 30px;
+            font-family: 'Fredoka One'; font-size: clamp(1.5rem, 4vw, 3em);
+            color: #2c3e50; border-radius: 20px; cursor: pointer;
+            transition: transform 0.1s; box-shadow: 0 8px 0 #bdc3c7;
+            min-width: 40%; flex: 1; border: 4px solid white;
+            touch-action: manipulation;
+        }
+        .option-btn:active { transform: translateY(8px); box-shadow: none; }
+        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* --- TIMER --- */
+        #timer-container { width: 100%; height: 20px; background: rgba(0,0,0,0.3); position: relative; }
+        #timer-bar { height: 100%; width: 100%; background: #2ecc71; transition: width 1s linear; }
+        #timer-text { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); font-family: 'Fredoka One'; font-size: 2em; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
+
+        /* --- CONTROLS --- */
+        #controls-bottom {
+            position: absolute; bottom: 20px; width: 100%;
+            display: flex; justify-content: center; gap: 20px;
+        }
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2); color: white;
+            border: 2px solid rgba(255,255,255,0.5); padding: 10px 20px;
+            border-radius: 30px; cursor: pointer; font-weight: bold;
+        }
+        
+        /* END BUTTON STYLE */
+        .btn-end { background: #c0392b; border-color: #e74c3c; box-shadow: 0 5px 0 #922b21; }
+        .btn-end:active { transform: translateY(3px); box-shadow: none; }
+
+        /* --- MODAL --- */
+        .modal-box { background: white; padding: 40px; border-radius: 20px; text-align: center; color: #333; border: 8px solid #f1c40f; }
         .btn-award { padding: 15px 30px; font-size: 1.5em; border: none; border-radius: 10px; cursor: pointer; font-family: 'Fredoka One'; margin: 10px; color: white; }
         .b-btn { background: #3498db; }
         .g-btn { background: #ff6b81; }
+        .t-btn { background: #8e44ad; }
 
-        /* --- WINNER SCREEN --- */
-        #winner-title { font-family: 'Fredoka One'; font-size: 5em; margin-bottom: 20px; animation: pulse 1s infinite; }
-        #winner-score { font-size: 3em; margin-bottom: 30px; }
-        .btn-restart { padding: 20px 50px; font-size: 2em; border-radius: 50px; background: #2ecc71; color: white; border: none; font-family: 'Fredoka One'; cursor: pointer; }
-
-        /* --- START SCREEN --- */
-        #start-title { font-family: 'Fredoka One'; font-size: 5em; color: #f1c40f; text-shadow: 4px 4px 0 #000; margin: 0; animation: pulse 2s infinite; }
-        .btn-start-game { padding: 25px 60px; font-size: 2.5em; border: none; border-radius: 50px; cursor: pointer; font-family: 'Fredoka One'; color: white; background: #2ecc71; box-shadow: 0 10px 0 #27ae60; transition: 0.2s; }
-        .btn-start-game:hover { transform: translateY(-3px); }
+        /* --- ANIMATIONS --- */
+        .correct-anim { background: #2ecc71 !important; color: white !important; transform: scale(1.05); }
+        .wrong-anim { background: #e74c3c !important; color: white !important; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
     </style>
 </head>
 <body>
 
-    <button id="history-btn" onclick="toggleHistory()">📜 HISTORY</button>
-
-    <div id="history-overlay">
-        <h2 style="margin-top:0; border-bottom: 2px solid #ccc; padding-bottom: 10px;">TOURNAMENT LOG</h2>
-        <div id="history-list" style="overflow-y: auto; flex: 1;"></div>
-        <button onclick="clearHistory()" style="background: #c0392b; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 10px;">🗑️ CLEAR DATA</button>
-        <button onclick="toggleHistory()" style="margin-top: 10px; background:#95a5a6; border:none; padding:10px; border-radius:10px; cursor:pointer; color:white;">CLOSE</button>
+    <div id="rules-screen" class="overlay">
+        <div class="rules-box">
+            <div class="rules-title">⚠️ CLASS RULES ⚠️</div>
+            <div class="rule-item">🤫 NO SHOUTING ALOUD</div>
+            <div class="rule-item">❄️ KEEP THE CLASS COOL</div>
+            <div class="rule-item">🤐 NO SIDE TALKING</div>
+            <button class="btn-agree" onclick="acceptRules()">I PROMISE ✋</button>
+        </div>
     </div>
 
-    <div id="start-screen" class="overlay">
-        <h1 id="start-title">THE SPELLING TRAP</h1>
-        <p style="font-size: 2em; margin-bottom: 50px; opacity: 0.8;">TOURNAMENT MODE</p>
-        <button class="btn-start-game" onclick="initGame()">WE ARE READY! 🚀</button>
+    <div id="difficulty-screen" class="overlay hidden">
+        <div class="title-large">SELECT LEVEL</div>
+        <div class="btn-container">
+            <button class="level-btn btn-easy" onclick="startGame('easy')">EASY (150+)</button>
+            <button class="level-btn btn-medium" onclick="startGame('medium')">MEDIUM (150+)</button>
+            <button class="level-btn btn-hard" onclick="startGame('hard')">HARD (150+)</button>
+        </div>
+        <button onclick="location.href='index.html'" style="margin-top:40px; background:transparent; border:2px solid white; color:white; padding:10px 30px; border-radius:30px; cursor:pointer;">EXIT TO HUB</button>
     </div>
 
     <div id="winner-screen" class="overlay hidden">
         <h1 id="winner-title">BOYS WIN! 🏆</h1>
-        <div id="winner-score">Score: 5 - 3</div>
-        <button class="btn-restart" onclick="restartGame()">PLAY AGAIN 🔄</button>
+        <div id="winner-details">B: 10 | G: 5 | T: 2</div>
+        <div class="btn-container">
+            <button class="level-btn btn-agree" onclick="location.reload()">PLAY AGAIN 🔄</button>
+            <button class="level-btn btn-home" onclick="location.href='index.html'">EXIT 🏠</button>
+        </div>
     </div>
 
     <div id="scoreboard">
         <div class="team-box">
             <div class="team-label">BOYS</div>
-            <div class="team-score" id="score-boys" style="color:#3498db">0</div>
+            <div class="team-score" id="score-boys">0</div>
+        </div>
+        <div class="team-box" style="border-color: #8e44ad;">
+            <div class="team-label" style="color:#8e44ad">TEACHER</div>
+            <div class="team-score" id="score-teacher" style="color:#8e44ad">0</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="ctrl-btn" onclick="showMenu()">☰ MENU</button>
         </div>
         <div class="team-box">
             <div class="team-label">GIRLS</div>
-            <div class="team-score" id="score-girls" style="color:#ff6b81">0</div>
+            <div class="team-score" id="score-girls">0</div>
         </div>
     </div>
 
@@ -245,256 +220,301 @@
     </div>
 
     <div id="game-area">
-        <div id="clue-box">WAITING...</div>
+        <div id="clue-box">Loading...</div>
         <div id="puzzle-text">_ _ _</div>
         
         <div id="options-container">
-            <button class="option-btn" id="btn-1" onclick="checkAnswer(1)">OPT 1</button>
-            <button class="option-btn" id="btn-2" onclick="checkAnswer(2)">OPT 2</button>
+            <button class="option-btn" id="btn-1" onclick="checkAnswer(1)">Option 1</button>
+            <button class="option-btn" id="btn-2" onclick="checkAnswer(2)">Option 2</button>
         </div>
     </div>
 
     <div id="controls-bottom">
-        <button class="ctrl-btn" id="btn-end" onclick="endCompetition()">🛑 END COMPETITION</button>
-        <button class="ctrl-btn" onclick="nextRound()">SKIP QUESTION ⏭️</button>
+        <button class="ctrl-btn btn-end" onclick="declareWinner()">🏆 END GAME</button>
+        <button class="ctrl-btn" onclick="nextRound()">SKIP ⏭️</button>
     </div>
 
     <div id="modal-overlay" class="overlay hidden">
         <div class="modal-box">
             <h1 style="margin:0; font-size:3em; color:#2ecc71;">CORRECT!</h1>
-            <p style="font-size:1.5em;">Who answered correctly?</p>
-            <button class="btn-award b-btn" onclick="addPoint('boys')">BOYS</button>
-            <button class="btn-award g-btn" onclick="addPoint('girls')">GIRLS</button>
+            <p style="font-size:1.5em;">Who gets the point?</p>
+            <div style="display:flex; flex-wrap:wrap; justify-content:center;">
+                <button class="btn-award b-btn" onclick="addPoint('boys')">BOYS</button>
+                <button class="btn-award t-btn" onclick="addPoint('teacher')">TEACHER</button>
+                <button class="btn-award g-btn" onclick="addPoint('girls')">GIRLS</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- DATABASE ---
-        const levels = [
-            ["A place to live", "HOUSE", "HORSE", "H _ _ S E"],
-            ["You wear this", "SHIRT", "SKIRT", "S _ I R T"],
-            ["A round toy", "BALL", "BELL", "B _ L L"],
-            ["It sails on water", "SHIP", "SHOP", "S H _ P"],
-            ["Opposite of cold", "HOT", "HAT", "H _ T"],
-            ["You wash hands with it", "SOAP", "SOUP", "S O _ P"],
-            ["A farm animal", "COW", "NOW", "_ O W"],
-            ["You cook in it", "PAN", "PEN", "P _ N"],
-            ["A color", "BLUE", "GLUE", "_ L U E"],
-            ["It flies in the sky", "PLANE", "PLAN", "P L A N _"],
-            ["Not noisy", "QUIET", "QUITE", "Q U _ _ T"],
-            ["A sweet treat", "DESSERT", "DESERT", "D E S _ E R T"],
-            ["Where you buy things", "STORE", "STORY", "S T O R _"],
-            ["To listen", "HEAR", "HERE", "H E _ R"],
-            ["A shape", "ANGLE", "ANGEL", "A N G _ E"],
-            ["Milk and Cheese", "DAIRY", "DIARY", "D _ _ R Y"],
-            ["You walk on it", "FLOOR", "FLOUR", "F L O _ R"],
-            ["Very big", "HUGE", "HUG", "H U G _"],
-            ["Opposite of weak", "STRONG", "STRING", "S T R _ N G"],
-            ["A green place", "GRASS", "GLASS", "G _ A S S"],
-            ["To give suggestion", "ADVISE", "ADVICE", "A D V I _ E"],
-            ["The weather right now", "WEATHER", "WHETHER", "W _ _ T H E R"],
-            ["Not tight", "LOOSE", "LOSE", "L O _ S E"],
-            ["Past tense of buy", "BOUGHT", "BROUGHT", "B _ O U G H T"],
-            ["A fruit", "PEAR", "PAIR", "P _ _ R"],
-            ["Part of a tree", "ROOT", "ROUTE", "R O _ T"],
-            ["To move fast", "RUN", "RAN", "R _ N"],
-            ["A coin", "CENT", "SCENT", "_ E N T"],
-            ["Group of people", "CROWD", "CLOUD", "C _ O _ D"],
-            ["To look at", "STARE", "STAIR", "S T A _ _"],
-            ["Eight (Number)", "EIGHT", "NIGHT", "_ I G H T"],
-            ["Opposite of right", "LEFT", "LIFT", "L _ F T"],
-            ["You write on it", "PAPER", "PEPPER", "P _ P E R"],
-            ["A month", "JUNE", "TUNE", "_ U N E"],
-            ["Feeling tired", "WEAK", "WEEK", "W E _ K"],
-            ["Where kings live", "CASTLE", "CATTLE", "C A _ T L E"],
-            ["To assist", "HELP", "HELD", "H E L _"],
-            ["Before second", "FIRST", "FIST", "F I _ S T"],
-            ["A small rug", "MAT", "MAP", "M A _"],
-            ["Body part", "MOUTH", "MONTH", "M O _ T H"]
-        ];
+        const db = {
+            easy: [
+                ["A place to live", "HOUSE", "HORSE"], ["You wear this", "SHIRT", "SKIRT"], ["A round toy", "BALL", "BELL"], ["Sails on water", "SHIP", "SHOP"], ["Opposite of cold", "HOT", "HAT"],
+                ["Wash hands with", "SOAP", "SOUP"], ["Farm animal", "COW", "NOW"], ["Cook in it", "PAN", "PEN"], ["A color", "BLUE", "GLUE"], ["Flies in sky", "PLANE", "PLAN"],
+                ["Not noisy", "QUIET", "QUITE"], ["Sweet treat", "DESSERT", "DESERT"], ["Buy things here", "STORE", "STORY"], ["To listen", "HEAR", "HERE"], ["A shape", "ANGLE", "ANGEL"],
+                ["Milk/Cheese", "DAIRY", "DIARY"], ["Walk on it", "FLOOR", "FLOUR"], ["Very big", "HUGE", "HUG"], ["Not weak", "STRONG", "STRING"], ["Green plant", "GRASS", "GLASS"],
+                ["Give suggestion", "ADVISE", "ADVICE"], ["Climate", "WEATHER", "WHETHER"], ["Not tight", "LOOSE", "LOSE"], ["Did buy", "BOUGHT", "BROUGHT"], ["Fruit", "PEAR", "PAIR"],
+                ["Tree part", "ROOT", "ROUTE"], ["Move fast", "RUN", "RAN"], ["Money", "CENT", "SCENT"], ["Many people", "CROWD", "CLOUD"], ["Look at", "STARE", "STAIR"],
+                ["Number 8", "EIGHT", "NIGHT"], ["Direction", "LEFT", "LIFT"], ["Write on", "PAPER", "PEPPER"], ["Month", "JUNE", "TUNE"], ["Not strong", "WEAK", "WEEK"],
+                ["King's home", "CASTLE", "CATTLE"], ["Assist", "HELP", "HELD"], ["#1 position", "FIRST", "FIST"], ["Floor rug", "MAT", "MAP"], ["Face part", "MOUTH", "MONTH"],
+                ["Animal dr.", "VET", "WET"], ["Sleep on", "BED", "BAD"], ["Small rock", "STONE", "STOVE"], ["Be happy", "SMILE", "SMELL"], ["Red fruit", "APPLE", "APPLY"],
+                ["Timepiece", "CLOCK", "CLICK"], ["Baby cat", "KITTEN", "KITCHEN"], ["Head wear", "HAT", "HUT"], ["Door key", "LOCK", "LUCK"], ["Not wet", "DRY", "TRY"],
+                ["Ice cream", "CONE", "BONE"], ["Bee home", "HIVE", "FIVE"], ["Number 10", "TEN", "TAN"], ["Write with", "PENCIL", "STENCIL"], ["Drink", "WATER", "WAITER"],
+                ["Night bird", "OWL", "BOWL"], ["School bag", "PACK", "BACK"], ["Body part", "NOSE", "ROSE"], ["Green amphibian", "FROG", "FOG"], ["Bread toast", "TOAST", "ROAST"],
+                ["Hot season", "SUMMER", "DRUMMER"], ["Cold season", "WINTER", "WINNER"], ["Rain gear", "BOOTS", "BOATS"], ["Flying toy", "KITE", "BITE"], ["Sleep vision", "DREAM", "CREAM"],
+                ["Meal time", "LUNCH", "LAUNCH"], ["Counting", "MATH", "MOTH"], ["Reading", "BOOK", "LOOK"], ["Music", "SONG", "LONG"], ["Happy face", "GLAD", "CLAD"],
+                ["Dad", "FATHER", "FEATHER"], ["Mom", "MOTHER", "OTHER"], ["Sibling", "SISTER", "BLISTER"], ["Boy sibling", "BROTHER", "BOTHER"], ["Grandma", "GRANNY", "NANNY"],
+                ["Pet", "DOG", "DIG"], ["Meow", "CAT", "CUT"], ["Cluck", "HEN", "PEN"], ["Oink", "PIG", "BIG"], ["Neigh", "HORSE", "HOUSE"],
+                ["Quack", "DUCK", "LUCK"], ["Moo", "COW", "HOW"], ["Wool", "SHEEP", "EEP"], ["Milk source", "GOAT", "BOAT"], ["Long ears", "RABBIT", "HABIT"],
+                ["Slow", "TURTLE", "PURPLE"], ["Swim", "FISH", "DISH"], ["Roar", "LION", "LINE"], ["Stripes", "TIGER", "FIGHTER"], ["Trunk", "ELEPHANT", "ELEGANT"],
+                ["Tall", "GIRAFFE", "CARAFE"], ["Black/White", "ZEBRA", "COBRA"], ["Swing", "MONKEY", "DONKEY"], ["Big mouth", "HIPPO", "ZIPPO"], ["Horn", "RHINO", "DINO"],
+                ["Slither", "SNAKE", "SNACK"], ["Crawl", "SPIDER", "SLIDER"], ["Honey", "BEE", "SEE"], ["Fly", "BIRD", "WORD"], ["Night", "BAT", "BET"],
+                ["Yellow fruit", "BANANA", "BANDANA"], ["Red fruit", "CHERRY", "SHERRY"], ["Orange", "ORANGE", "RANGE"], ["Green fruit", "GRAPE", "DRAPE"], ["Sour", "LEMON", "DEMON"],
+                ["Sweet", "CANDY", "HANDY"], ["Baked", "CAKE", "LAKE"], ["Cold treat", "ICE", "MICE"], ["Breakfast", "EGG", "LEG"], ["Drink white", "MILK", "SILK"],
+                ["Sandwich", "BREAD", "DREAD"], ["Meat", "CHICKEN", "KITCHEN"], ["Italian", "PIZZA", "PIAZZA"], ["Long food", "PASTA", "PASTE"], ["Liquid", "JUICE", "ICE"],
+                ["Hot drink", "TEA", "SEA"], ["Bean drink", "COFFEE", "TOFFEE"], ["White grain", "RICE", "MICE"], ["Veggie", "CORN", "HORN"], ["Red veg", "TOMATO", "POTATO"],
+                ["Classroom", "DESK", "DISK"], ["Write board", "CHALK", "WALK"], ["Cut paper", "SCISSORS", "VISORS"], ["Stick", "GLUE", "BLUE"], ["Carry", "BAG", "RAG"],
+                ["Read", "STORY", "STORE"], ["Draw", "ART", "CART"], ["Sing", "MUSIC", "MAGIC"], ["Play", "GAME", "FAME"], ["Win", "PRIZE", "PRICE"],
+                ["Shape", "CIRCLE", "CIRCUS"], ["Four sides", "SQUARE", "STARE"], ["Three sides", "TRIANGLE", "TANGLE"], ["Five points", "STAR", "STIR"], ["Love", "HEART", "HURT"],
+                ["Color", "PINK", "SINK"], ["Dark", "BLACK", "BLOCK"], ["Light", "WHITE", "KITE"], ["Grass", "GREEN", "QUEEN"], ["Sky", "BLUE", "GLUE"],
+                ["Fire", "RED", "BED"], ["Sun", "YELLOW", "FELLOW"], ["Grape", "PURPLE", "PEOPLE"], ["Dirt", "BROWN", "CROWN"], ["Metal", "GOLD", "COLD"],
+                ["Money", "COIN", "JOIN"], ["Paper money", "BILL", "PILL"], ["Rich", "WEALTH", "HEALTH"], ["Cost", "PRICE", "PRIZE"], ["Store", "SHOP", "SHIP"]
+            ],
+            medium: [
+                ["Correct", "RIGHT", "WRITE"], ["Not heavy", "LIGHT", "LITE"], ["Construct", "BUILD", "BILLED"], ["A comrade", "FRIEND", "FREIND"], ["Get", "RECEIVE", "RECIEVE"],
+                ["Sure", "DEFINITE", "DEFIANT"], ["Start", "BEGINNING", "BEGINING"], ["Tomorrow", "TOMORROW", "TOMMOROW"], ["Calm", "PEACE", "PIECE"], ["Simple", "EASY", "EZ"],
+                ["Under", "BELOW", "BELLOW"], ["Above", "ABOVE", "ABOUT"], ["Travel", "JOURNEY", "JURNEY"], ["Location", "PLACE", "PLAICE"], ["Nation", "COUNTRY", "COUNTY"],
+                ["Group", "PEOPLE", "PEEPLE"], ["Knowledge", "LEARN", "LERN"], ["Teach", "TEACHER", "TEATCHER"], ["Class", "STUDENT", "STUDANT"], ["Building", "SCHOOL", "SKOOL"],
+                ["Season", "AUTUMN", "AUTUM"], ["Cold time", "WINTER", "WINNER"], ["Hot time", "SUMMER", "SOMMER"], ["Bloom time", "SPRING", "SPRUNG"], ["Rainy", "STORM", "STREAM"],
+                ["Fast", "QUICK", "KWICK"], ["Quiet", "SILENT", "SILANT"], ["Loud", "NOISY", "NOSEY"], ["Startled", "SURPRISE", "SUPRISE"], ["Faith", "BELIEVE", "BELEIVE"],
+                ["Goal", "SUCCESS", "SUCESS"], ["Different", "SPECIAL", "SPEICAL"], ["Need", "NECESSARY", "NECESARY"], ["Divide", "SEPARATE", "SEPERATE"], ["Funny", "HUMOR", "HUMER"],
+                ["Use", "USEFUL", "USEFULL"], ["Until", "UNTIL", "TILL"], ["Truly", "TRULY", "TRUELLY"], ["Complete", "WHOLE", "HOLE"], ["Part", "PIECE", "PEACE"],
+                ["Look", "APPEAR", "APEAR"], ["Go away", "DISAPPEAR", "DISSAPEAR"], ["Feeling", "EMOTION", "EMOSION"], ["Scared", "AFRAID", "AFRADE"], ["Mad", "ANGRY", "ANGLY"],
+                ["Smart", "INTELLIGENT", "INTELIGENT"], ["Pretty", "BEAUTIFUL", "BEUTIFUL"], ["Job", "CAREER", "CARER"], ["Doctor", "MEDICINE", "MEDICIN"], ["Help", "ASSIST", "ASIST"],
+                ["Protect", "GUARD", "GARD"], ["Leader", "CHIEF", "CHEIF"], ["King", "REIGN", "RAIN"], ["Outside", "FOREIGN", "FORIEN"], ["Heavy", "WEIGHT", "WAIT"],
+                ["Height", "HEIGHT", "HIGHT"], ["Number 40", "FORTY", "FOURTY"], ["Number 90", "NINETY", "NINTY"], ["Across", "THROUGH", "THRU"], ["Careful", "THOROUGH", "THROUGH"],
+                ["Understand", "REALIZE", "RELIZE"], ["Known", "FAMILIAR", "FAMILAR"], ["Similar", "ALIKE", "ALICK"], ["Different", "VARIOUS", "VERIOUS"], ["Choose", "DECIDE", "DICIDE"],
+                ["Maybe", "PROBABLY", "PROBBLY"], ["Result", "EFFECT", "AFFECT"], ["Action", "AFFECT", "EFFECT"], ["Stop", "CEASE", "SEIZE"], ["Grab", "SEIZE", "CEASE"],
+                ["Letter", "STATIONERY", "STATIONARY"], ["Still", "STATIONARY", "STATIONERY"], ["City", "CAPITAL", "CAPITOL"], ["Building", "CAPITOL", "CAPITAL"], ["Rule", "PRINCIPLE", "PRINCIPAL"],
+                ["Headmaster", "PRINCIPAL", "PRINCIPLE"], ["Past", "PASSED", "PAST"], ["Time", "PAST", "PASSED"], ["Allow", "ACCEPT", "EXCEPT"], ["But", "EXCEPT", "ACCEPT"],
+                ["Desert", "DESERT", "DESSERT"], ["Sweet", "DESSERT", "DESERT"], ["Place", "THERE", "THEIR"], ["Owners", "THEIR", "THERE"], ["They are", "THEY'RE", "THERE"],
+                ["Possess", "WHOSE", "WHO'S"], ["Who is", "WHO'S", "WHOSE"], ["Your are", "YOU'RE", "YOUR"], ["Possess", "YOUR", "YOU'RE"], ["It is", "IT'S", "ITS"],
+                ["Possess", "ITS", "IT'S"], ["Relax", "LOOSE", "LOSE"], ["Lost", "LOSE", "LOOSE"], ["Weather", "WEATHER", "WHETHER"], ["If", "WHETHER", "WEATHER"],
+                ["See", "SIGHT", "SITE"], ["Place", "SITE", "CITE"], ["Quote", "CITE", "SITE"], ["Path", "COURSE", "COARSE"], ["Rough", "COARSE", "COURSE"],
+                ["Group", "COUNCIL", "COUNSEL"], ["Advise", "COUNSEL", "COUNCIL"], ["Compliment", "COMPLEMENT", "COMPLIMENT"], ["Praise", "COMPLIMENT", "COMPLEMENT"], ["Morning", "MORNING", "MOURNING"],
+                ["Grief", "MOURNING", "MORNING"], ["Naked", "BARE", "BEAR"], ["Animal", "BEAR", "BARE"], ["Check", "BREAK", "BRAKE"], ["Stop car", "BRAKE", "BREAK"],
+                ["Flower", "FLOWER", "FLOUR"], ["Baking", "FLOUR", "FLOWER"], ["Male", "MALE", "MAIL"], ["Post", "MAIL", "MALE"], ["Pain", "PAIN", "PANE"],
+                ["Window", "PANE", "PAIN"], ["Story", "TALE", "TAIL"], ["Animal part", "TAIL", "TALE"], ["Wait", "WAIT", "WEIGHT"], ["Heavy", "WEIGHT", "WAIT"],
+                ["Road", "WAY", "WEIGH"], ["Scale", "WEIGH", "WAY"], ["Fee", "FARE", "FAIR"], ["Equal", "FAIR", "FARE"], ["Stair", "STAIR", "STARE"],
+                ["Look", "STARE", "STAIR"], ["Metal", "STEEL", "STEAL"], ["Rob", "STEAL", "STEEL"], ["Number 2", "TWO", "TOO"], ["Also", "TOO", "TWO"],
+                ["To go", "TO", "TOO"], ["Sea movement", "WAVE", "WAIVE"], ["Give up", "WAIVE", "WAVE"], ["Feeble", "WEAK", "WEEK"], ["7 Days", "WEEK", "WEAK"]
+            ],
+            hard: [
+                ["Govt system", "BUREAUCRACY", "BEUROCRACY"], ["Helpful", "ACCOMMODATE", "ACCOMODATE"], ["Shame", "EMBARRASS", "EMBARASS"], ["Rhythm", "RHYTHM", "RYTHM"], ["Duty", "CONSCIENCE", "CONCIENCE"],
+                ["Aware", "CONSCIOUS", "CONCIOUS"], ["Rank", "COLONEL", "KERNEL"], ["Separate", "SEPARATE", "SEPERATE"], ["Event", "OCCURRENCE", "OCCURENCE"], ["Give up", "YIELD", "YEILD"],
+                ["Weird", "WEIRD", "WIERD"], ["Permission", "LICENSE", "LISENCE"], ["Keep", "MAINTENANCE", "MAINTAINANCE"], ["Benefit", "PRIVILEGE", "PRIVILEDGE"], ["Schedule", "CALENDAR", "CALENDER"],
+                ["Promise", "GUARANTEE", "GARANTEE"], ["Fun", "PASTIME", "PASSTIME"], ["Go past", "EXCEED", "EXEED"], ["Stubborn", "PERSEVERE", "PERSERVERE"], ["Argument", "ARGUMENT", "ARGUEMENT"],
+                ["Getting", "RECEIVING", "RECIEVING"], ["Job", "ENTREPRENEUR", "ENTREPRENUER"], ["Question", "QUESTIONNAIRE", "QUESTIONAIRE"], ["Change", "MANEUVER", "MANUEVER"], ["Agreement", "CONSENSUS", "CONCENSUS"],
+                ["Spy", "ESPIONAGE", "ESPIANAGE"], ["Middle", "MEDIEVAL", "MEDIVAL"], ["Ghost", "APPARITION", "APARITION"], ["Example", "PARADIGM", "PARADIM"], ["Jewelry", "JEWELRY", "JEWLRY"],
+                ["Old", "ANCIENT", "ANCIANT"], ["Respect", "ALLEGIANCE", "ALEGIANCE"], ["Space", "VACUUM", "VACCUM"], ["Copy", "MIMIC", "MIMMICK"], ["King", "SOVEREIGN", "SOVERIGN"],
+                ["Drink", "LIQUEUR", "LIQUOR"], ["Book list", "BIBLIOGRAPHY", "BIBLIOGRAFY"], ["Doctor", "PHYSICIAN", "PHISICIAN"], ["Lungs", "PNEUMONIA", "NUMONIA"], ["Mind", "PSYCHOLOGY", "SYCHOLOGY"],
+                ["Water", "AQUATIC", "AQUATICK"], ["Food", "ZUCCHINI", "ZUCHINI"], ["Plant", "BROCCOLI", "BROCOLI"], ["Spice", "CINNAMON", "CINAMON"], ["Drink", "CAPPUCCINO", "CAPUCINO"],
+                ["Boat", "YACHT", "YATCH"], ["Music", "RHYTHM", "RYTHEM"], ["Rhyme", "RHYME", "RIME"], ["Drum", "CYMBAL", "SYMBOL"], ["Sign", "SYMBOL", "CYMBAL"],
+                ["Story", "MYTH", "MITH"], ["Fake", "PSEUDONYM", "SUDONYM"], ["Touch", "TACTILE", "TACTILL"], ["See", "VISUAL", "VIZUAL"], ["Hear", "AUDITORY", "AUDITERY"],
+                ["Smell", "OLFACTORY", "OLFACTERY"], ["Taste", "GUSTATORY", "GUSTATERY"], ["Logic", "FALLACY", "PHALLACY"], ["Wrong", "ERRONEOUS", "ERRONIOUS"], ["Correct", "ACCURATE", "ACURATE"],
+                ["Exact", "PRECISE", "PRECIZE"], ["Short", "CONCISE", "CONSIZE"], ["Wordy", "VERBOSE", "VERBOSE"], ["Quiet", "TACITURN", "TACITERN"], ["Talkative", "LOQUACIOUS", "LOQUATIOUS"],
+                ["Sleepy", "LETHARGIC", "LETHARJIC"], ["Energetic", "VIGOROUS", "VIGERIOUS"], ["Weak", "FRAIL", "FRALE"], ["Strong", "ROBUST", "ROBUSTE"], ["Happy", "ECSTATIC", "ECSTATICK"],
+                ["Sad", "MELANCHOLY", "MELANCOLLEY"], ["Fear", "PHOBIA", "FOBIA"], ["Love", "PHILIA", "FILIA"], ["Hate", "MISANTHROPE", "MISSANTHROPE"], ["Good", "BENEVOLENT", "BENIVOLENT"],
+                ["Bad", "MALEVOLENT", "MALIVOLENT"], ["Truth", "VERACITY", "VARACITY"], ["Lie", "MENDACITY", "MENDASITY"], ["Bold", "AUDACIOUS", "AUDATIOUS"], ["Shy", "TIMID", "TIMMED"],
+                ["Wise", "SAGACIOUS", "SAGATIOUS"], ["Dumb", "OBTUSE", "OBTOOSE"], ["Clear", "LUCID", "LUSID"], ["Cloudy", "OPAQUE", "OPAKE"], ["Short", "BRIEF", "BREIF"],
+                ["Lengthy", "PROLONGED", "PROLONGUED"], ["Stop", "HALT", "HAULT"], ["Go", "PROCEED", "PROCEDE"], ["Win", "TRIUMPH", "TRIUMF"], ["Fail", "DEFEAT", "DEFEET"],
+                ["Rich", "AFFLUENT", "AFLUENT"], ["Poor", "DESTITUTE", "DESTATUTE"], ["Help", "AID", "ADE"], ["Hurt", "HARM", "HARM"], ["Build", "CONSTRUCT", "KONSTRUCT"],
+                ["Break", "DEMOLISH", "DEMOLISHE"], ["Start", "INITIATE", "INITATE"], ["End", "TERMINATE", "TERMINATE"], ["Give", "DONATE", "DONATE"], ["Take", "CONFISCATE", "CONFISKATE"],
+                ["Buy", "PURCHASE", "PERCHASE"], ["Sell", "VEND", "VEND"], ["Borrow", "BORROW", "BARROW"], ["Lend", "LEND", "LEND"], ["Teach", "EDUCATE", "EDDUCATE"],
+                ["Learn", "ACQUIRE", "AQUIRE"], ["Know", "COGNIZANT", "COGNIZENT"], ["Forget", "OBLIVIOUS", "OBLIVIUS"], ["See", "PERCEIVE", "PERCIEVE"], ["Ignore", "DISREGARD", "DISREGUARD"],
+                ["Love", "ADORE", "ADOUR"], ["Hate", "LOATHE", "LOATH"], ["Trust", "RELY", "RELY"], ["Doubt", "SKEPTICAL", "SCEPTICAL"], ["Believe", "CREDIBLE", "CREDABLE"],
+                ["Fake", "SPURIOUS", "SPURIUS"], ["Real", "AUTHENTIC", "AUTHENTICK"], ["Copy", "IMITATION", "IMITACION"], ["Same", "IDENTICAL", "IDENTICLE"], ["Mix", "MISCELLANEOUS", "MISCELANEOUS"]
+            ]
+        };
 
-        let scores = { boys: 0, girls: 0 };
-        let currentLevel = {};
-        let correctBtnIndex = 0;
-        let timeLeft = 10;
+        // --- GAME STATE ---
+        let currentPool = [];
+        let scores = { boys: 0, girls: 0, teacher: 0 };
         let timerInterval;
-        
-        // --- HISTORY SYSTEM ---
-        let matchHistory = JSON.parse(localStorage.getItem('spellingTrapHistory')) || [];
+        let timeLeft = 10;
+        let correctBtn = 0;
 
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = "";
-            if (matchHistory.length === 0) {
-                list.innerHTML = "<p style='text-align:center;'>No matches yet.</p>";
-                return;
-            }
-            matchHistory.slice().reverse().forEach((match, index) => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                let winText = match.boys > match.girls ? "<span class='b-win'>BOYS</span>" : 
-                              match.girls > match.boys ? "<span class='g-win'>GIRLS</span>" : "<span class='draw'>DRAW</span>";
-                div.innerHTML = `<div>#${matchHistory.length - index} ${winText}</div><div>${match.boys} - ${match.girls}</div>`;
-                list.appendChild(div);
-            });
+        // --- FUNCTIONS ---
+
+        function acceptRules() {
+            document.getElementById('rules-screen').classList.add('hidden');
+            document.getElementById('difficulty-screen').classList.remove('hidden');
         }
 
-        function toggleHistory() {
-            document.getElementById('history-overlay').classList.toggle('open');
-            renderHistory();
-        }
-
-        function clearHistory() {
-            if(confirm("Delete all history?")) {
-                matchHistory = [];
-                localStorage.removeItem('spellingTrapHistory');
-                renderHistory();
-            }
-        }
-
-        function saveMatch() {
-            matchHistory.push({ boys: scores.boys, girls: scores.girls });
-            localStorage.setItem('spellingTrapHistory', JSON.stringify(matchHistory));
-        }
-
-        // --- GAME FUNCTIONS ---
-
-        function initGame() {
-            document.getElementById('start-screen').classList.add('hidden');
+        function startGame(level) {
+            currentPool = [...db[level]];
+            scores = { boys: 0, girls: 0, teacher: 0 };
+            updateScores();
+            document.getElementById('difficulty-screen').classList.add('hidden');
             nextRound();
         }
 
-        function restartGame() {
-            scores = { boys: 0, girls: 0 };
-            document.getElementById('score-boys').innerText = '0';
-            document.getElementById('score-girls').innerText = '0';
-            document.getElementById('winner-screen').classList.add('hidden');
-            document.getElementById('start-screen').classList.remove('hidden');
+        function showMenu() {
+            document.getElementById('difficulty-screen').classList.remove('hidden');
         }
 
-        function endCompetition() {
+        function generatePuzzleText(word) {
+            if (word.length <= 2) return word[0] + " _";
+            let res = word[0] + " ";
+            for(let i=1; i<word.length-1; i++) res += "_ ";
+            res += word[word.length-1];
+            return res;
+        }
+
+        function declareWinner() {
             clearInterval(timerInterval);
-            saveMatch();
+            document.getElementById('winner-screen').classList.remove('hidden');
             
-            const winScreen = document.getElementById('winner-screen');
-            const winTitle = document.getElementById('winner-title');
-            const winScore = document.getElementById('winner-score');
+            const title = document.getElementById('winner-title');
+            const details = document.getElementById('winner-details');
             
-            winScreen.classList.remove('hidden');
-            winScore.innerText = `Final: BOYS ${scores.boys} - ${scores.girls} GIRLS`;
+            let winner = "";
+            let color = "";
             
-            if (scores.boys > scores.girls) {
-                winTitle.innerText = "BOYS WIN! 🏆";
-                winTitle.style.color = "#3498db";
-            } else if (scores.girls > scores.boys) {
-                winTitle.innerText = "GIRLS WIN! 🏆";
-                winTitle.style.color = "#ff6b81";
+            // Logic to determine winner
+            if (scores.boys > scores.girls && scores.boys > scores.teacher) {
+                winner = "BOYS WIN! 🏆";
+                color = "#3498db";
+            } else if (scores.girls > scores.boys && scores.girls > scores.teacher) {
+                winner = "GIRLS WIN! 🏆";
+                color = "#ff6b81";
+            } else if (scores.teacher > scores.boys && scores.teacher > scores.girls) {
+                winner = "TEACHER WINS! 🎓";
+                color = "#8e44ad";
             } else {
-                winTitle.innerText = "IT'S A DRAW! 🤝";
-                winTitle.style.color = "#f1c40f";
+                winner = "IT'S A DRAW! 🤝";
+                color = "#f1c40f";
             }
+            
+            title.innerText = winner;
+            title.style.color = color;
+            details.innerText = `BOYS: ${scores.boys} | GIRLS: ${scores.girls} | TEACHER: ${scores.teacher}`;
         }
 
         function nextRound() {
             clearInterval(timerInterval);
+            document.getElementById('modal-overlay').classList.add('hidden');
             
-            // Reset Timer UI
-            timeLeft = 10;
-            document.getElementById('timer-text').innerText = "10";
-            document.getElementById('timer-bar').style.width = "100%";
-            document.getElementById('timer-bar').style.background = "#2ecc71";
-            document.getElementById('timer-bar').style.boxShadow = "0 0 10px #2ecc71";
-
-            const data = levels[Math.floor(Math.random() * levels.length)];
-            currentLevel = { clue: data[0], correct: data[1], wrong: data[2], blank: data[3] };
-
-            document.getElementById('clue-box').innerText = currentLevel.clue;
-            document.getElementById('puzzle-text').innerText = currentLevel.blank;
+            if (currentPool.length === 0) { alert("Game Over! All words used."); return; }
+            const randIdx = Math.floor(Math.random() * currentPool.length);
+            const data = currentPool[randIdx];
             
+            document.getElementById('clue-box').innerText = data[0];
+            document.getElementById('puzzle-text').innerText = generatePuzzleText(data[1]);
+
             const btn1 = document.getElementById('btn-1');
             const btn2 = document.getElementById('btn-2');
             
-            btn1.className = "option-btn"; btn2.className = "option-btn";
             btn1.disabled = false; btn2.disabled = false;
+            btn1.className = "option-btn"; btn2.className = "option-btn";
             btn1.style.background = "white"; btn2.style.background = "white";
             btn1.style.color = "#2c3e50"; btn2.style.color = "#2c3e50";
 
             if (Math.random() > 0.5) {
-                btn1.innerText = currentLevel.correct;
-                btn2.innerText = currentLevel.wrong;
-                correctBtnIndex = 1;
+                btn1.innerText = data[1]; // Correct
+                btn2.innerText = data[2]; // Wrong
+                correctBtn = 1;
             } else {
-                btn1.innerText = currentLevel.wrong;
-                btn2.innerText = currentLevel.correct;
-                correctBtnIndex = 2;
+                btn1.innerText = data[2]; // Wrong
+                btn2.innerText = data[1]; // Correct
+                correctBtn = 2;
             }
+
             startTimer();
         }
 
         function startTimer() {
+            timeLeft = 10;
+            updateTimerUI();
+            
             timerInterval = setInterval(() => {
                 timeLeft--;
-                document.getElementById('timer-text').innerText = timeLeft;
-                
-                const percentage = (timeLeft / 10) * 100;
-                const bar = document.getElementById('timer-bar');
-                bar.style.width = percentage + "%";
-
-                if (timeLeft <= 5) {
-                    bar.style.background = "#e74c3c"; 
-                    bar.style.boxShadow = "0 0 10px #e74c3c";
-                } else if (timeLeft <= 7) {
-                    bar.style.background = "#f1c40f"; 
-                    bar.style.boxShadow = "0 0 10px #f1c40f";
-                }
-
+                updateTimerUI();
                 if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
                     handleTimeUp();
                 }
             }, 1000);
         }
 
-        function handleTimeUp() {
-            clearInterval(timerInterval);
-            document.getElementById('clue-box').innerText = "TIME'S UP! ⏰";
-            document.getElementById('btn-1').disabled = true;
-            document.getElementById('btn-2').disabled = true;
-            document.getElementById('btn-' + correctBtnIndex).style.background = "#2ecc71";
-            document.getElementById('btn-' + correctBtnIndex).style.color = "white";
+        function updateTimerUI() {
+            document.getElementById('timer-text').innerText = timeLeft;
+            const pct = (timeLeft / 10) * 100;
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = pct + "%";
+            
+            if (timeLeft <= 3) { 
+                bar.style.background = "#e74c3c"; 
+            } else if (timeLeft <= 6) { 
+                bar.style.background = "#f1c40f"; 
+            } else {
+                bar.style.background = "#2ecc71"; 
+            }
         }
 
-        function checkAnswer(btnIndex) {
-            clearInterval(timerInterval);
-            const btn = document.getElementById('btn-' + btnIndex);
+        function handleTimeUp() {
+            document.getElementById('clue-box').innerText = "TIME'S UP! ⏰";
+            disableButtons();
             
-            if (btnIndex === correctBtnIndex) {
+            setTimeout(() => {
+                document.getElementById('modal-overlay').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function checkAnswer(btnIdx) {
+            const btn = document.getElementById('btn-' + btnIdx);
+            
+            if (btnIdx === correctBtn) {
+                // CORRECT
+                clearInterval(timerInterval);
                 btn.classList.add('correct-anim');
+                btn.style.background = "#2ecc71";
+                btn.style.color = "white";
+                
+                // Disable other
+                const other = (btnIdx === 1) ? 2 : 1;
+                document.getElementById('btn-' + other).disabled = true;
+
                 setTimeout(() => {
                     document.getElementById('modal-overlay').classList.remove('hidden');
                 }, 500);
             } else {
+                // WRONG - TRY AGAIN LOGIC
                 btn.classList.add('wrong-anim');
-                btn.disabled = true;
-                document.getElementById('clue-box').innerText = "WRONG! ❌";
-                document.getElementById('btn-' + correctBtnIndex).style.background = "#2ecc71";
-                document.getElementById('btn-' + correctBtnIndex).style.color = "white";
+                btn.style.background = "#e74c3c";
+                btn.style.color = "white";
+                btn.disabled = true; // Disable just this one
+                document.getElementById('clue-box').innerText = "TRY AGAIN! ⚠️";
+                // DO NOT SHOW MODAL YET. Let them click the other one.
             }
+        }
+
+        function disableButtons() {
+            document.getElementById('btn-1').disabled = true;
+            document.getElementById('btn-2').disabled = true;
         }
 
         function addPoint(team) {
-            if (team === 'boys') {
-                scores.boys++;
-                document.getElementById('score-boys').innerText = scores.boys;
-            } else {
-                scores.girls++;
-                document.getElementById('score-girls').innerText = scores.girls;
-            }
-            document.getElementById('modal-overlay').classList.add('hidden');
+            scores[team]++;
+            updateScores();
             nextRound();
         }
 
-        // Initialize history
-        renderHistory();
+        function updateScores() {
+            document.getElementById('score-boys').innerText = scores.boys;
+            document.getElementById('score-girls').innerText = scores.girls;
+            document.getElementById('score-teacher').innerText = scores.teacher;
+        }
 
     </script>
 </body>
