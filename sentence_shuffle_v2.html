@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentence Shuffle: PRO EDITION</title>
+    <title>Sentence Shuffle: Fixed Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
 
@@ -21,56 +21,64 @@
 
         /* --- SCOREBOARD --- */
         #scoreboard {
-            display: flex; justify-content: space-between; padding: 15px 40px;
-            background: rgba(0,0,0,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10;
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 20px; background: rgba(0,0,0,0.2); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10;
         }
         .team-box {
-            text-align: center; background: white; color: #333; padding: 5px 30px;
-            border-radius: 15px; min-width: 120px; box-shadow: 0 4px 0 #bdc3c7;
+            text-align: center; background: white; color: #333; 
+            padding: 5px 20px; border-radius: 15px; min-width: 80px; 
+            box-shadow: 0 4px 0 #bdc3c7; border: 3px solid transparent;
         }
-        .team-label { font-size: 1em; font-weight: bold; opacity: 0.7; }
+        .team-label { font-size: 0.9em; font-weight: bold; opacity: 0.7; }
         .team-score { font-family: 'Fredoka One'; font-size: 2.5em; line-height: 1; }
+        
         #s-boys { color: #3498db; }
         #s-girls { color: #ff6b81; }
+        #s-teacher { color: #8e44ad; border-color: #8e44ad; }
 
         /* --- GAME AREA --- */
         #game-area {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex: 1; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
             padding: 20px; position: relative;
         }
 
-        /* --- ANSWER ZONE (Where blocks go) --- */
+        /* --- ANSWER ZONE --- */
         #answer-zone {
-            min-height: 80px; width: 90%; max-width: 900px;
-            background: rgba(255,255,255,0.2); border-radius: 15px;
-            border: 3px dashed rgba(255,255,255,0.4);
+            min-height: 100px; width: 95%; max-width: 1400px;
+            background: rgba(255,255,255,0.2); border-radius: 20px;
+            border: 4px dashed rgba(255,255,255,0.4);
             display: flex; justify-content: center; align-items: center; flex-wrap: wrap;
-            gap: 15px; padding: 15px; margin-bottom: 40px; transition: 0.3s;
+            gap: 15px; padding: 20px; margin-bottom: 40px; transition: 0.3s;
         }
         #answer-zone.correct-zone { background: rgba(46, 204, 113, 0.3); border-color: #2ecc71; }
         #answer-zone.wrong-zone { background: rgba(231, 76, 60, 0.3); border-color: #e74c3c; animation: shake 0.4s; }
 
-        /* --- SOURCE ZONE (Jumbled blocks) --- */
+        /* --- SOURCE ZONE --- */
         #source-zone {
             display: flex; justify-content: center; flex-wrap: wrap; gap: 15px;
-            max-width: 900px;
+            max-width: 1400px; width: 95%;
         }
 
-        /* --- WORDS --- */
+        /* --- WORD BLOCKS (Responsive) --- */
         .word-block {
-            background: white; color: #2c3e50; padding: 15px 25px;
-            font-family: 'Fredoka One'; font-size: 2em; border-radius: 12px;
-            cursor: pointer; user-select: none; box-shadow: 0 6px 0 #bdc3c7;
-            transition: transform 0.1s;
+            background: white; color: #2c3e50; 
+            padding: 15px 30px; font-family: 'Fredoka One'; 
+            font-size: clamp(1.5rem, 3vw, 2.5rem); 
+            border-radius: 15px; cursor: pointer; 
+            box-shadow: 0 6px 0 #bdc3c7; transition: transform 0.1s;
+            touch-action: manipulation;
         }
         .word-block:active { transform: translateY(4px); box-shadow: none; }
         .word-block:hover { transform: translateY(-2px); background: #f0f0f0; }
 
         /* --- TIMER --- */
-        #timer-container { width: 100%; height: 15px; background: rgba(0,0,0,0.3); }
+        #timer-container { width: 100%; height: 20px; background: rgba(0,0,0,0.3); position: relative; }
         #timer-bar { height: 100%; width: 100%; background: #f1c40f; transition: width 1s linear; }
+        #timer-text { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); font-family: 'Fredoka One'; font-size: 2em; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
 
-        /* --- MODALS & OVERLAYS --- */
+        /* --- OVERLAYS --- */
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 100;
@@ -82,50 +90,65 @@
             background: white; padding: 40px; border-radius: 20px; text-align: center;
             color: #333; border: 8px solid #f1c40f; animation: popIn 0.3s;
         }
-        .btn-large {
-            padding: 15px 40px; font-size: 1.5em; border: none; border-radius: 50px;
-            cursor: pointer; font-family: 'Fredoka One'; margin: 10px; color: white;
-            transition: 0.2s;
-        }
-        .btn-large:hover { transform: scale(1.05); }
+        .btn-award { padding: 15px 30px; font-size: 1.5em; border: none; border-radius: 10px; cursor: pointer; font-family: 'Fredoka One'; margin: 10px; color: white; }
+        .b-btn { background: #3498db; }
+        .g-btn { background: #ff6b81; }
+        .t-btn { background: #8e44ad; }
 
-        /* --- ANIMATIONS --- */
+        /* --- WINNER SCREEN --- */
+        #winner-screen h1 { 
+            font-family: 'Fredoka One'; font-size: clamp(4rem, 10vw, 8rem); margin: 0; 
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3); animation: pulse 1s infinite;
+        }
+        #final-score-display { font-size: 2.5em; font-weight: bold; margin: 20px 0 40px 0; }
+        
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- SETTINGS --- */
-        #settings-bar {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 30px;
-            display: flex; gap: 10px;
+        /* --- DIFFICULTY SCREEN --- */
+        #difficulty-screen .title { font-family: 'Fredoka One'; font-size: 4em; margin-bottom: 30px; color: #f1c40f; }
+        .btn-level {
+            padding: 20px 50px; font-size: 2em; margin: 10px; border-radius: 20px; border: none;
+            font-family: 'Fredoka One'; color: white; cursor: pointer; transition: transform 0.2s;
         }
-        .diff-btn {
-            background: transparent; border: 2px solid white; color: white;
-            padding: 5px 15px; border-radius: 15px; cursor: pointer; font-weight: bold;
-        }
-        .diff-btn.active { background: white; color: #333; }
+        .btn-level:hover { transform: translateY(-5px); }
+        .lvl-easy { background: #2ecc71; }
+        .lvl-medium { background: #f39c12; }
+        .lvl-hard { background: #e74c3c; }
 
         /* --- CONTROLS --- */
         .ctrl-btn {
-            background: rgba(255,255,255,0.2); color: white; border: none;
-            padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;
-            margin: 0 5px;
+            background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.5);
+            padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; margin: 0 5px;
         }
+        .btn-end { background: #c0392b; border-color: #e74c3c; box-shadow: 0 5px 0 #922b21; }
+        .btn-end:active { transform: translateY(3px); box-shadow: none; }
+        
+        .btn-exit { position: absolute; top: 20px; right: 20px; background: #c0392b; border: none; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; z-index: 200; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
+    <button class="btn-exit" onclick="location.href='index.html'">EXIT 🏠</button>
+
     <div id="start-screen" class="overlay">
-        <h1 style="font-family: 'Fredoka One'; font-size: 5em; color: #f1c40f; margin: 0;">SENTENCE SHUFFLE</h1>
-        <p style="font-size: 2em; margin-bottom: 40px;">Put the words in the correct order!</p>
-        <button class="btn-large" style="background: #27ae60;" onclick="startGame()">START GAME 🚀</button>
+        <div class="title">CHOOSE LEVEL</div>
+        <div>
+            <button class="btn-level lvl-easy" onclick="startGame('easy')">EASY</button>
+            <button class="btn-level lvl-medium" onclick="startGame('medium')">MEDIUM</button>
+            <button class="btn-level lvl-hard" onclick="startGame('hard')">HARD</button>
+        </div>
     </div>
 
     <div id="winner-screen" class="overlay hidden">
-        <h1 id="winner-title" style="font-family: 'Fredoka One'; font-size: 5em;">WINNER!</h1>
-        <div id="winner-score" style="font-size: 2em; margin-bottom: 20px;">0 - 0</div>
-        <button class="btn-large" style="background: #3498db;" onclick="restartGame()">PLAY AGAIN</button>
+        <h1 id="winner-title">BOYS WIN! 🏆</h1>
+        <div id="final-score-display">B: 10 | G: 5 | T: 0</div>
+        <div>
+            <button class="btn-level lvl-easy" onclick="restartGame()">PLAY AGAIN 🔄</button>
+            <button class="btn-level lvl-hard" onclick="location.href='index.html'">EXIT 🏠</button>
+        </div>
     </div>
 
     <div id="scoreboard">
@@ -133,9 +156,12 @@
             <div class="team-label">BOYS</div>
             <div id="score-boys" class="team-score">0</div>
         </div>
+        <div class="team-box" style="border-color: #8e44ad;">
+            <div class="team-label" style="color:#8e44ad">TEACHER</div>
+            <div id="score-teacher" class="team-score" style="color:#8e44ad">0</div>
+        </div>
         <div style="display: flex; align-items: center;">
-            <button class="ctrl-btn" onclick="toggleHistory()">📜 LOG</button>
-            <button class="ctrl-btn" style="background: #c0392b;" onclick="endGame()">🛑 END</button>
+            <button class="ctrl-btn" onclick="restartGame()">MENU</button>
         </div>
         <div class="team-box">
             <div class="team-label">GIRLS</div>
@@ -143,21 +169,19 @@
         </div>
     </div>
 
-    <div id="timer-container"><div id="timer-bar"></div></div>
+    <div id="timer-container">
+        <div id="timer-bar"></div>
+        <div id="timer-text">30</div>
+    </div>
 
     <div id="game-area">
         <div id="answer-zone"></div>
         <div id="source-zone"></div>
         <div style="margin-top: 30px;">
-            <button class="ctrl-btn" onclick="resetRound()">🔄 RESET WORDS</button>
-            <button class="ctrl-btn" onclick="skipRound()">⏭️ SKIP</button>
+            <button class="ctrl-btn btn-end" onclick="endGame()">🏆 END GAME</button>
+            <button class="ctrl-btn" onclick="resetRound()">🔄 RESET</button>
+            <button class="ctrl-btn" onclick="nextRound()">⏭️ SKIP</button>
         </div>
-    </div>
-
-    <div id="settings-bar">
-        <button class="diff-btn active" onclick="setDiff('easy', this)">EASY</button>
-        <button class="diff-btn" onclick="setDiff('medium', this)">MEDIUM</button>
-        <button class="diff-btn" onclick="setDiff('hard', this)">HARD</button>
     </div>
 
     <div id="point-modal" class="overlay hidden">
@@ -165,100 +189,192 @@
             <h2 style="color: #27ae60; font-size: 2.5em; margin:0;">PERFECT SENTENCE!</h2>
             <p id="correct-sent-display" style="font-size: 1.5em; font-weight: bold; color: #555;">...</p>
             <p>Who solved it?</p>
-            <button class="btn-large" style="background: #3498db;" onclick="awardPoint('boys')">BOYS</button>
-            <button class="btn-large" style="background: #ff6b81;" onclick="awardPoint('girls')">GIRLS</button>
-        </div>
-    </div>
-
-    <div id="history-modal" class="overlay hidden" style="background: rgba(0,0,0,0.8);">
-        <div class="modal-box" style="width: 400px; text-align: left;">
-            <h2 style="border-bottom: 2px solid #ddd; padding-bottom: 10px;">MATCH HISTORY</h2>
-            <div id="history-list" style="height: 200px; overflow-y: auto;"></div>
-            <button class="btn-large" style="background: #7f8c8d; font-size: 1em; width: 100%;" onclick="toggleHistory()">CLOSE</button>
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                <button class="btn-award b-btn" onclick="awardPoint('boys')">BOYS</button>
+                <button class="btn-award t-btn" onclick="awardPoint('teacher')">TEACHER</button>
+                <button class="btn-award g-btn" onclick="awardPoint('girls')">GIRLS</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- DATA: UPGRADED DIFFICULTY ---
-        const data = {
+        // --- MASSIVE SENTENCE DATABASE ---
+        const db = {
             easy: [
-                "THE CAT IS RED", "I LIKE PIZZA", "THE SUN IS HOT", "DOGS CAN RUN FAST",
-                "MY MOM IS NICE", "I HAVE A PEN", "THE SKY IS BLUE", "WE PLAY GAMES",
-                "BIRDS CAN FLY HIGH", "FISH SWIM IN WATER", "THE BALL IS ROUND", "SHE HAS A CAT",
-                "HE IS MY FRIEND", "APPLES ARE RED", "MILK IS WHITE", "I GO TO SCHOOL"
+                "THE CAT IS RED", "I LIKE PIZZA", "THE SUN IS HOT", "DOGS CAN RUN FAST", "MY MOM IS NICE",
+                "I HAVE A PEN", "THE SKY IS BLUE", "WE PLAY GAMES", "BIRDS CAN FLY HIGH", "FISH SWIM IN WATER",
+                "THE BALL IS ROUND", "SHE HAS A CAT", "HE IS MY FRIEND", "APPLES ARE RED", "MILK IS WHITE",
+                "I GO TO SCHOOL", "MY DAD IS TALL", "IT IS A DOG", "LOOK AT THE MOON", "WE EAT ICE CREAM",
+                "THE GRASS IS GREEN", "I CAN READ BOOKS", "SHE IS HAPPY", "HE IS SAD TODAY", "WE LOVE TO PLAY",
+                "THE CAR IS FAST", "MY BAG IS BLUE", "I SEE A BIRD", "THE TREE IS BIG", "CATS LIKE MILK",
+                "IT IS RAINING NOW", "OPEN THE DOOR", "CLOSE THE WINDOW", "STAND UP PLEASE", "SIT DOWN NOW",
+                "I AM SIX YEARS OLD", "MY NAME IS TOM", "THIS IS MY BOOK", "THAT IS A PEN", "WE ARE FRIENDS",
+                "I LIKE TO SWIM", "SHE LIKES TO DANCE", "HE LIKES TO SING", "THEY LIKE TO RUN", "WE LIKE TO JUMP",
+                "THE DOG BARKS LOUD", "THE CAT MEOWS SOFTLY", "BIRDS CHIRP IN TREES", "COWS EAT GREEN GRASS", "HORSES RUN VERY FAST",
+                "I WASH MY HANDS", "BRUSH YOUR TEETH", "COMB YOUR HAIR", "PUT ON YOUR SHOES", "TIE YOUR LACES",
+                "EAT YOUR DINNER", "DRINK YOUR MILK", "GO TO SLEEP", "WAKE UP EARLY", "GOOD MORNING MOM",
+                "GOOD NIGHT DAD", "HELLO MY FRIEND", "HOW ARE YOU", "I AM FINE THANKS", "WHAT IS YOUR NAME",
+                "WHERE DO YOU LIVE", "I LIVE IN A HOUSE", "THE HOUSE IS BIG", "MY ROOM IS CLEAN", "I LOVE MY FAMILY",
+                "GRANDMA IS VERY KIND", "GRANDPA IS FUNNY", "I HAVE A SISTER", "I HAVE A BROTHER", "WE PLAY TOGETHER",
+                "THE SUN SHINES BRIGHT", "THE MOON GLOWS", "STARS TWINKLE AT NIGHT", "CLOUDS ARE WHITE", "RAIN FALLS DOWN",
+                "SNOW IS VERY COLD", "FIRE IS VERY HOT", "ICE CREAM IS SWEET", "LEMONS ARE SOUR", "CANDY IS YUMMY",
+                "I DRAW A PICTURE", "SHE PAINTS A FLOWER", "HE WRITES A LETTER", "WE READ A STORY", "THEY WATCH A MOVIE",
+                "RUN TO THE PARK", "WALK TO THE STORE", "JUMP OVER THE LOG", "SWIM IN THE POOL", "RIDE A BICYCLE",
+                "KICK THE SOCCER BALL", "THROW THE FRISBEE", "CATCH THE BASEBALL", "HIT THE TENNIS BALL", "PLAY WITH THE TOYS",
+                "THE FLOWER IS PRETTY", "THE BEE IS BUSY", "THE ANT IS SMALL", "THE ELEPHANT IS HUGE", "THE GIRAFFE IS TALL",
+                "THE MONKEY IS FUNNY", "THE LION IS STRONG", "THE TIGER IS FAST", "THE BEAR IS BIG", "THE MOUSE IS TINY",
+                "ONE TWO THREE GO", "FOUR FIVE SIX JUMP", "SEVEN EIGHT NINE HOP", "TEN IS THE END", "COLORS ARE EVERYWHERE",
+                "RED YELLOW AND BLUE", "GREEN ORANGE AND PURPLE", "BLACK AND WHITE", "PINK AND BROWN", "GOLD AND SILVER",
+                "MY FAVORITE COLOR", "I LIKE BLUE BEST", "SHE LIKES PINK", "HE LIKES GREEN", "WE LIKE YELLOW"
             ],
             medium: [
-                "MY BROTHER PLAYS FOOTBALL IN THE PARK", 
-                "WHERE IS THE LIBRARY LOCATED", 
-                "I EAT A HEALTHY BREAKFAST EVERY DAY",
-                "SHE IS READING A VERY INTERESTING BOOK", 
-                "THEY ARE GOING HOME AFTER SCHOOL", 
-                "MY ENGLISH TEACHER IS VERY KIND",
-                "WE WATCHED A SCARY MOVIE YESTERDAY", 
-                "DO YOU LIKE CHOCOLATE ICE CREAM", 
-                "THE RED CAR IS VERY FAST",
-                "IT IS RAINING HEAVILY OUTSIDE NOW", 
-                "PLEASE OPEN THE DOOR FOR ME", 
-                "CAN YOU HELP ME WITH HOMEWORK",
-                "THE TIGER IS A STRONG ANIMAL", 
-                "SUMMER IS VERY HOT IN THIS CITY"
+                "MY BROTHER PLAYS FOOTBALL IN THE PARK", "WHERE IS THE LIBRARY LOCATED", "I EAT A HEALTHY BREAKFAST EVERY DAY",
+                "SHE IS READING A VERY INTERESTING BOOK", "THEY ARE GOING HOME AFTER SCHOOL", "MY ENGLISH TEACHER IS VERY KIND",
+                "WE WATCHED A SCARY MOVIE YESTERDAY", "DO YOU LIKE CHOCOLATE ICE CREAM", "THE RED CAR IS VERY FAST",
+                "IT IS RAINING HEAVILY OUTSIDE NOW", "PLEASE OPEN THE DOOR FOR ME", "CAN YOU HELP ME WITH HOMEWORK",
+                "THE TIGER IS A STRONG ANIMAL", "SUMMER IS VERY HOT IN THIS CITY", "I WANT TO BE A DOCTOR",
+                "MY SISTER IS OLDER THAN ME", "WE WENT TO THE ZOO YESTERDAY", "THE ELEPHANT HAS A LONG TRUNK",
+                "GIRAFFES HAVE VERY LONG NECKS", "MONKEYS LOVE TO EAT BANANAS", "BIRDS BUILD NESTS IN THE TREES",
+                "FISH LIVE UNDER THE WATER", "DOLPHINS ARE VERY SMART ANIMALS", "SHARKS HAVE VERY SHARP TEETH",
+                "I BRUSH MY TEETH TWICE DAILY", "ALWAYS WASH YOUR HANDS BEFORE EATING", "EATING VEGETABLES IS GOOD FOR YOU",
+                "DRINK PLENTY OF WATER EVERY DAY", "EXERCISE MAKES YOUR BODY STRONG", "SLEEPING EARLY IS A GOOD HABIT",
+                "THE SUN RISES IN THE EAST", "THE SUN SETS IN THE WEST", "THE EARTH GOES AROUND THE SUN",
+                "THE MOON GOES AROUND THE EARTH", "THERE ARE SEVEN DAYS IN A WEEK", "THERE ARE TWELVE MONTHS IN A YEAR",
+                "JANUARY IS THE FIRST MONTH", "DECEMBER IS THE LAST MONTH", "SUNDAY IS A HOLIDAY FOR US",
+                "WE GO TO SCHOOL ON MONDAY", "MY FAVORITE SUBJECT IS SCIENCE", "I LIKE TO SOLVE MATH PROBLEMS",
+                "HISTORY TELLS US ABOUT THE PAST", "GEOGRAPHY IS ABOUT THE WORLD", "ART CLASS IS VERY FUN",
+                "MUSIC MAKES ME FEEL HAPPY", "I PLAY THE GUITAR VERY WELL", "SHE SINGS BEAUTIFULLY IN THE CHOIR",
+                "WE PLAY SOCCER DURING RECESS", "BASKETBALL IS A POPULAR SPORT", "TENNIS IS PLAYED WITH A RACKET",
+                "SWIMMING IS A GREAT EXERCISE", "RUNNING IS GOOD FOR YOUR HEART", "YOGA HELPS YOU TO RELAX",
+                "READING BOOKS IMPROVES YOUR VOCABULARY", "WRITING STORIES IS VERY CREATIVE", "PAINTING PICTURES IS A HOBBY",
+                "COLLECTING STAMPS IS INTERESTING", "GARDENING IS GOOD FOR NATURE", "COOKING IS A USEFUL SKILL",
+                "MY MOTHER COOKS DELICIOUS FOOD", "MY FATHER DRIVES A BLUE CAR", "MY GRANDPA TELLS FUNNY JOKES",
+                "MY GRANDMA BAKES TASTY COOKIES", "I HAVE A CUTE PUPPY DOG", "MY CAT SLEEPS ON THE SOFA",
+                "THE PARROT CAN TALK LIKE HUMANS", "THE RABBIT HOPS VERY FAST", "THE TURTLE WALKS VERY SLOWLY",
+                "A CHEETAH IS FASTER THAN A LION", "AN AIRPLANE FLIES ABOVE THE CLOUDS", "A TRAIN RUNS ON THE TRACKS",
+                "A BOAT SAILS ON THE RIVER", "A BICYCLE HAS TWO WHEELS", "A TRICYCLE HAS THREE WHEELS",
+                "A CAR HAS FOUR WHEELS", "A BUS CARRIES MANY PEOPLE", "AN AMBULANCE TAKES PATIENTS TO HOSPITAL",
+                "A FIRETROUCK PUTS OUT FIRES", "A POLICE CAR CHASIES CRIMINALS", "A POSTMAN DELIVERS LETTERS TO US",
+                "A DOCTOR CURES SICK PEOPLE", "A TEACHER TEACHES STUDENTS IN SCHOOL", "A FARMER GROWS CROPS IN FIELDS",
+                "A BAKER BAKES BREAD AND CAKES", "A CHEF COOKS IN A RESTAURANT", "A PILOT FLIES AN AIRPLANE",
+                "AN ASTRONAUT GOES TO SPACE", "A SCIENTIST DOES EXPERIMENTS", "AN ARTIST PAINTS BEAUTIFUL PICTURES",
+                "A MUSICIAN PLAYS MUSICAL INSTRUMENTS", "A DANCER DANCES ON THE STAGE", "AN ACTOR ACTS IN MOVIES",
+                "A WRITER WRITES BOOKS AND STORIES", "A PHOTOGRAPHER TAKES NICE PHOTOS", "A REPORTER GIVES US NEWS",
+                "A LIBRARIAN WORKS IN A LIBRARY", "A BANKER WORKS IN A BANK", "A SHOPKEEPER SELLS THINGS IN SHOP",
+                "A WAITER SERVES FOOD IN RESTAURANT"
             ],
             hard: [
-                "IF IT RAINS TOMORROW WE WILL STAY INSIDE",
-                "THE GREAT WALL OF CHINA IS VISIBLE FROM SPACE",
-                "SHE WAS COOKING DINNER WHILE HE WAS READING",
-                "ALTHOUGH HE WAS TIRED HE KEPT WORKING HARD",
-                "HAVE YOU EVER VISITED THE EIFEL TOWER IN PARIS",
-                "THE FASTEST ANIMAL ON LAND IS THE CHEETAH",
-                "WE SHOULD ALWAYS TRY TO HELP OTHER PEOPLE",
-                "YESTERDAY I BOUGHT A GIFT FOR MY BEST FRIEND",
-                "SCIENCE IS THE STUDY OF THE NATURAL WORLD",
-                "WITHOUT WATER NO LIFE CAN SURVIVE ON EARTH",
-                "THE MOON ORBITS AROUND THE EARTH EVERY MONTH",
-                "BEFORE YOU EAT DINNER YOU MUST WASH YOUR HANDS"
+                "IF IT RAINS TOMORROW WE WILL STAY INSIDE", "THE GREAT WALL OF CHINA IS VISIBLE FROM SPACE", "SHE WAS COOKING DINNER WHILE HE WAS READING",
+                "ALTHOUGH HE WAS TIRED HE KEPT WORKING HARD", "HAVE YOU EVER VISITED THE EIFEL TOWER IN PARIS", "THE FASTEST ANIMAL ON LAND IS THE CHEETAH",
+                "WE SHOULD ALWAYS TRY TO HELP OTHER PEOPLE", "YESTERDAY I BOUGHT A GIFT FOR MY BEST FRIEND", "SCIENCE IS THE STUDY OF THE NATURAL WORLD",
+                "WITHOUT WATER NO LIFE CAN SURVIVE ON EARTH", "THE MOON ORBITS AROUND THE EARTH EVERY MONTH", "BEFORE YOU EAT DINNER YOU MUST WASH YOUR HANDS",
+                "THE AMAZON RAINFOREST IS THE LARGEST IN THE WORLD", "MOUNT EVEREST IS THE HIGHEST MOUNTAIN ON EARTH", "THE PACIFIC OCEAN IS THE DEEPEST OCEAN",
+                "ELECTRICITY IS ESSENTIAL FOR MODERN LIFE", "THE INTERNET CONNECTS PEOPLE FROM ALL OVER THE WORLD", "COMPUTERS HELP US SOLVE COMPLEX PROBLEMS QUICKLY",
+                "SMARTPHONES HAVE CHANGED THE WAY WE COMMUNICATE", "SOCIAL MEDIA ALLOWS US TO SHARE OUR LIVES", "ARTIFICIAL INTELLIGENCE IS CHANGING THE FUTURE",
+                "RENEWABLE ENERGY IS BETTER FOR THE ENVIRONMENT", "CLIMATE CHANGE IS A SERIOUS GLOBAL PROBLEM", "WE MUST PROTECT ENDANGERED SPECIES FROM EXTINCTION",
+                "RECYCLING HELPS TO REDUCE WASTE AND POLLUTION", "PLANTING TREES IS GOOD FOR THE ATMOSPHERE", "CLEAN WATER IS SCARCE IN MANY COUNTRIES",
+                "EDUCATION IS THE KEY TO A BETTER FUTURE", "READING BROADENS YOUR MIND AND IMAGINATION", "LEARNING A NEW LANGUAGE IS A GREAT CHALLENGE",
+                "MATHEMATICS IS THE LANGUAGE OF THE UNIVERSE", "PHYSICS EXPLAINS HOW THE WORLD WORKS", "CHEMISTRY IS THE STUDY OF MATTER AND CHANGE",
+                "BIOLOGY IS THE SCIENCE OF LIVING THINGS", "ASTRONOMY IS THE STUDY OF STARS AND PLANETS", "GEOLOGY STUDY OF THE EARTH AND ROCKS",
+                "HISTORY TEACHES US ABOUT PAST CIVILIZATIONS", "ARCHAEOLOGY DIGS UP ANCIENT ARTIFACTS", "PSYCHOLOGY IS THE STUDY OF THE HUMAN MIND",
+                "SOCIOLOGY IS THE STUDY OF HUMAN SOCIETY", "ECONOMICS IS ABOUT MONEY AND TRADE", "POLITICS IS THE STUDY OF GOVERNMENT AND POWER",
+                "PHILOSOPHY ASKS QUESTIONS ABOUT LIFE AND EXISTENCE", "LITERATURE IS THE ART OF WRITTEN WORKS", "POETRY EXPRESSES FEELINGS THROUGH WORDS",
+                "MUSIC IS A UNIVERSAL LANGUAGE OF EMOTION", "ART REFLECTS THE CULTURE OF A SOCIETY", "THEATER BRINGS STORIES TO LIFE ON STAGE",
+                "MOVIES ARE A POPULAR FORM OF ENTERTAINMENT", "SPORTS TEACH US TEAMWORK AND DISCIPLINE", "THE OLYMPIC GAMES BRING NATIONS TOGETHER",
+                "WORLD PEACE IS A GOAL FOR HUMANITY", "HUMAN RIGHTS ARE IMPORTANT FOR EVERYONE", "DEMOCRACY GIVES POWER TO THE PEOPLE",
+                "FREEDOM OF SPEECH IS A FUNDAMENTAL RIGHT", "JUSTICE SHOULD BE EQUAL FOR ALL CITIZENS", "POVERTY IS A MAJOR PROBLEM IN MANY PLACES",
+                "DISEASE CAN SPREAD RAPIDLY ACROSS BORDERS", "VACCINES HELP TO PREVENT SERIOUS ILLNESSES", "HOSPITALS PROVIDE CARE FOR THE SICK",
+                "DOCTORS AND NURSES SAVE MANY LIVES", "SCIENTISTS ARE SEARCHING FOR A CURE FOR CANCER", "TECHNOLOGY IS ADVANCING AT A RAPID PACE",
+                "SPACE EXPLORATION MAY LEAD TO NEW DISCOVERIES", "ASTRONAUTS TRAVEL TO THE INTERNATIONAL SPACE STATION", "MARS IS THE NEXT TARGET FOR HUMAN EXPLORATION",
+                "THE UNIVERSE IS VAST AND FULL OF MYSTERIES", "BLACK HOLES HAVE GRAVITY THAT TRAPS LIGHT", "GALAXIES CONTAIN BILLIONS OF STARS AND PLANETS",
+                "OUR SOLAR SYSTEM HAS EIGHT PLANETS", "MERCURY IS THE CLOSEST PLANET TO THE SUN", "VENUS IS THE HOTTEST PLANET IN SYSTEM",
+                "EARTH IS THE ONLY PLANET WITH LIFE", "MARS IS KNOWN AS THE RED PLANET", "JUPITER IS THE LARGEST PLANET OF ALL",
+                "SATURN HAS BEAUTIFUL RINGS AROUND IT", "URANUS IS A COLD AND ICY PLANET", "NEPTUNE IS THE FARTHEST PLANET FROM SUN",
+                "PLUTO IS NOW CLASSIFIED AS DWARF PLANET", "COMETS ARE BALLS OF ICE AND DUST", "ASTEROIDS ORBIT THE SUN BETWEEN MARS JUPITER",
+                "METEORS BURN UP IN THE EARTH ATMOSPHERE", "THE BIG BANG THEORY EXPLAINS UNIVERSE ORIGIN", "EVOLUTION EXPLAINS HOW SPECIES CHANGE OVER TIME",
+                "DNA CONTAINS THE GENETIC INFORMATION OF LIFE", "CELLS ARE THE BUILDING BLOCKS OF LIVING THINGS", "ATOMS ARE THE BUILDING BLOCKS OF MATTER",
+                "ELECTRONS ORBIT THE NUCLEUS OF AN ATOM", "GRAVITY KEEPS OUR FEET ON THE GROUND", "MAGNETISM IS AN INVISIBLE FORCE OF NATURE",
+                "LIGHT TRAVELS FASTER THAN SOUND WAVES", "SOUND VIBRATIONS TRAVEL THROUGH THE AIR", "ENERGY CANNOT BE CREATED OR DESTROYED",
+                "THE LAWS OF PHYSICS GOVERN THE UNIVERSE", "MATHEMATICS IS USED TO DESCRIBE NATURAL LAWS", "LOGIC IS USED TO SOLVE COMPLEX PROBLEMS"
             ]
         };
 
-        let currentDiff = 'easy';
-        let currentSentence = [];
+        // --- STATE VARIABLES ---
+        let currentPool = [];
+        let currentSentenceArr = [];
         let placedWords = [];
-        let scores = { boys: 0, girls: 0 };
+        let scores = { boys: 0, girls: 0, teacher: 0 };
         let timerInterval;
-        let timeLeft = 45;
+        let timeLeft = 30;
 
-        // --- GAME LOGIC ---
-        function setDiff(level, btn) {
-            currentDiff = level;
-            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+        // --- FUNCTIONS ---
 
-        function startGame() {
+        function startGame(level) {
+            currentPool = [...db[level]];
+            scores = { boys: 0, girls: 0, teacher: 0 };
+            updateScores();
             document.getElementById('start-screen').classList.add('hidden');
             nextRound();
         }
 
+        // --- FIX: RESTART GAME FUNCTION ---
+        function restartGame() {
+            document.getElementById('winner-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            clearInterval(timerInterval);
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            document.getElementById('winner-screen').classList.remove('hidden');
+            
+            const title = document.getElementById('winner-title');
+            let winnerText = "";
+            let color = "";
+
+            if (scores.boys > scores.girls && scores.boys > scores.teacher) {
+                winnerText = "BOYS WIN! 🏆";
+                color = "#3498db";
+            } else if (scores.girls > scores.boys && scores.girls > scores.teacher) {
+                winnerText = "GIRLS WIN! 🏆";
+                color = "#ff6b81";
+            } else if (scores.teacher > scores.boys && scores.teacher > scores.girls) {
+                winnerText = "TEACHER WINS! 🎓";
+                color = "#8e44ad";
+            } else {
+                winnerText = "IT'S A DRAW! 🤝";
+                color = "#f1c40f";
+            }
+
+            title.innerText = winnerText;
+            title.style.color = color;
+            document.getElementById('final-score-display').innerText = `BOYS: ${scores.boys} | GIRLS: ${scores.girls} | TEACHER: ${scores.teacher}`;
+        }
+
         function nextRound() {
             clearInterval(timerInterval);
-            timeLeft = 60; // Increased time for harder sentences
-            startTimer();
+            document.getElementById('point-modal').classList.add('hidden');
+            
+            if (currentPool.length === 0) {
+                alert("Game Over! All sentences used.");
+                restartGame();
+                return;
+            }
 
-            // Clear zones
+            const randIdx = Math.floor(Math.random() * currentPool.length);
+            const sentenceStr = currentPool[randIdx];
+            currentPool.splice(randIdx, 1);
+
+            currentSentenceArr = sentenceStr.split(" ");
+            placedWords = [];
+
             document.getElementById('answer-zone').innerHTML = "";
             document.getElementById('source-zone').innerHTML = "";
             document.getElementById('answer-zone').className = "";
-            placedWords = [];
 
-            // Pick sentence
-            const pool = data[currentDiff];
-            const sentenceStr = pool[Math.floor(Math.random() * pool.length)];
-            currentSentence = sentenceStr.split(" ");
-            
-            // Create shuffled copy
-            let shuffled = [...currentSentence];
+            let shuffled = [...currentSentenceArr];
             shuffled.sort(() => Math.random() - 0.5);
 
-            // Render words
             shuffled.forEach(word => {
                 const btn = document.createElement('div');
                 btn.className = 'word-block';
@@ -266,6 +382,31 @@
                 btn.onclick = () => handleWordClick(btn, word);
                 document.getElementById('source-zone').appendChild(btn);
             });
+
+            timeLeft = 30;
+            startTimer();
+        }
+
+        function startTimer() {
+            updateTimerUI();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('answer-zone').classList.add('wrong-zone');
+                    alert("TIME'S UP!");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            document.getElementById('timer-text').innerText = timeLeft;
+            const pct = (timeLeft / 30) * 100;
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = pct + "%";
+            if (timeLeft <= 10) bar.style.background = "#e74c3c";
+            else bar.style.background = "#f1c40f";
         }
 
         function handleWordClick(btnElement, wordText) {
@@ -278,17 +419,16 @@
         function returnWord(btnElement, wordText) {
             document.getElementById('source-zone').appendChild(btnElement);
             btnElement.onclick = () => handleWordClick(btnElement, wordText);
-            const index = placedWords.indexOf(wordText);
+            const index = placedWords.lastIndexOf(wordText);
             if (index > -1) placedWords.splice(index, 1);
             document.getElementById('answer-zone').className = ""; 
         }
 
         function checkOrder() {
             const zone = document.getElementById('answer-zone');
-            
             let isCorrectSoFar = true;
             for(let i=0; i<placedWords.length; i++) {
-                if (placedWords[i] !== currentSentence[i]) {
+                if (placedWords[i] !== currentSentenceArr[i]) {
                     isCorrectSoFar = false;
                     break;
                 }
@@ -299,10 +439,10 @@
                 setTimeout(() => zone.classList.remove('wrong-zone'), 500);
             } else {
                 zone.classList.remove('wrong-zone');
-                if (placedWords.length === currentSentence.length) {
+                if (placedWords.length === currentSentenceArr.length) {
                     zone.classList.add('correct-zone');
                     clearInterval(timerInterval);
-                    setTimeout(() => { showPointModal(); }, 500);
+                    setTimeout(showPointModal, 500);
                 }
             }
         }
@@ -320,93 +460,22 @@
         }
 
         function showPointModal() {
+            document.getElementById('correct-sent-display').innerText = currentSentenceArr.join(" ");
             document.getElementById('point-modal').classList.remove('hidden');
-            document.getElementById('correct-sent-display').innerText = currentSentence.join(" ");
         }
 
         function awardPoint(team) {
-            if (team === 'boys') {
-                scores.boys++;
-                document.getElementById('score-boys').innerText = scores.boys;
-            } else {
-                scores.girls++;
-                document.getElementById('score-girls').innerText = scores.girls;
-            }
-            document.getElementById('point-modal').classList.add('hidden');
+            scores[team]++;
+            updateScores();
             nextRound();
         }
 
-        function skipRound() {
-            nextRound();
+        function updateScores() {
+            document.getElementById('score-boys').innerText = scores.boys;
+            document.getElementById('score-girls').innerText = scores.girls;
+            document.getElementById('score-teacher').innerText = scores.teacher;
         }
 
-        // --- TIMER ---
-        function startTimer() {
-            const bar = document.getElementById('timer-bar');
-            bar.style.width = "100%";
-            bar.style.background = "#f1c40f";
-            
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                const pct = (timeLeft / 60) * 100;
-                bar.style.width = pct + "%";
-                if (timeLeft < 10) bar.style.background = "#e74c3c";
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    alert("TIME'S UP! Try again.");
-                    resetRound();
-                    timeLeft = 60; 
-                    startTimer();
-                }
-            }, 1000);
-        }
-
-        // --- END & RESTART ---
-        function endGame() {
-            clearInterval(timerInterval);
-            saveHistory();
-            document.getElementById('winner-screen').classList.remove('hidden');
-            document.getElementById('winner-score').innerText = `BOYS ${scores.boys} - ${scores.girls} GIRLS`;
-            
-            const title = document.getElementById('winner-title');
-            if (scores.boys > scores.girls) { title.innerText = "BOYS WIN!"; title.style.color = "#3498db"; }
-            else if (scores.girls > scores.boys) { title.innerText = "GIRLS WIN!"; title.style.color = "#ff6b81"; }
-            else { title.innerText = "DRAW!"; title.style.color = "#f1c40f"; }
-        }
-
-        function restartGame() {
-            // Reset scores
-            scores = { boys: 0, girls: 0 };
-            document.getElementById('score-boys').innerText = '0';
-            document.getElementById('score-girls').innerText = '0';
-            
-            // Hide winner screen
-            document.getElementById('winner-screen').classList.add('hidden');
-            
-            // Start a new game
-            nextRound();
-        }
-
-        function saveHistory() {
-            let hist = JSON.parse(localStorage.getItem('sentenceShuffleHistory')) || [];
-            hist.push({ date: new Date().toLocaleTimeString(), b: scores.boys, g: scores.girls });
-            localStorage.setItem('sentenceShuffleHistory', JSON.stringify(hist));
-        }
-
-        function toggleHistory() {
-            const modal = document.getElementById('history-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                const list = document.getElementById('history-list');
-                list.innerHTML = "";
-                let hist = JSON.parse(localStorage.getItem('sentenceShuffleHistory')) || [];
-                hist.slice().reverse().forEach(h => {
-                    list.innerHTML += `<div style="background:white; padding:10px; margin:5px; border-radius:5px;">
-                        <b>${h.date}</b>: Boys ${h.b} - ${h.g} Girls
-                    </div>`;
-                });
-            }
-        }
     </script>
 </body>
 </html>
