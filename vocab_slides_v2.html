@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vocab Master: Pro Edition</title>
+    <title>Vocab Master: Zero Lag Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
 
@@ -19,97 +19,162 @@
             flex-direction: column;
         }
 
+        /* --- DIFFICULTY SCREEN --- */
+        #difficulty-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 300;
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+            transition: opacity 0.5s;
+        }
+        
+        .hidden { display: none !important; opacity: 0; pointer-events: none; }
+
+        .title-large { font-family: 'Fredoka One'; font-size: clamp(3rem, 6vw, 5rem); margin-bottom: 40px; color: #f1c40f; text-shadow: 0 5px 0 #c29d0b; text-align: center;}
+        
+        .btn-container { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+
+        .level-btn {
+            padding: 20px 50px; font-size: clamp(1.5rem, 3vw, 2.5rem); border: none; border-radius: 20px;
+            cursor: pointer; font-family: 'Fredoka One'; color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 250px; text-align: center;
+        }
+        .level-btn:hover { transform: translateY(-5px); filter: brightness(1.1); }
+        .level-btn:active { transform: translateY(5px); box-shadow: none !important; }
+
+        .btn-easy { background: #2ecc71; box-shadow: 0 10px 0 #27ae60; }
+        .btn-medium { background: #f39c12; box-shadow: 0 10px 0 #d35400; }
+        .btn-hard { background: #e74c3c; box-shadow: 0 10px 0 #c0392b; }
+
         /* --- SLIDE STAGE --- */
         #slide-stage {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; z-index: 1;
+            flex: 1; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            position: relative; z-index: 1; padding: 20px;
         }
 
         .card-box {
-            background: white; color: #333; width: 85%; max-width: 1000px;
-            padding: 80px 40px; border-radius: 30px; text-align: center;
+            background: white; color: #333; 
+            width: 90%; max-width: 1200px;
+            padding: 5vh 5vw; 
+            border-radius: 30px; text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative;
             border-bottom: 12px solid #ddd;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 50vh;
         }
 
         #english-word {
-            font-family: 'Fredoka One', cursive; font-size: 5.5em; color: #2c3e50;
-            margin: 0; line-height: 1.1; letter-spacing: 2px;
+            font-family: 'Fredoka One', cursive; 
+            font-size: clamp(3rem, 8vw, 7rem); 
+            color: #2c3e50; margin: 0; line-height: 1.1; letter-spacing: 2px;
         }
 
         #bangla-meaning {
-            font-size: 3.5em; margin-top: 30px; color: #e74c3c; font-weight: bold;
-            transition: 0.4s ease-out; cursor: pointer; padding: 15px 40px;
+            font-size: clamp(2rem, 5vw, 4rem); 
+            margin-top: 30px; font-weight: bold;
+            padding: 15px 40px;
             border-radius: 15px; display: inline-block; min-width: 200px;
         }
 
-        /* EFFECTS */
-        .blur { filter: blur(30px); background: #f0f0f0; user-select: none; color: transparent; }
-        .reveal { filter: blur(0); background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+        /* --- THE FIX IS HERE --- */
         
-        .hint-text { color: #95a5a6; margin-top: 15px; font-size: 1.2em; font-style: italic; }
+        /* 1. BLUR STATE: No transition (Instant Hiding) */
+        .blur { 
+            filter: blur(40px); /* Increased blur intensity */
+            background: #e0e0e0; 
+            color: transparent; 
+            user-select: none;
+            transition: none !important; /* CRITICAL: INSTANT CHANGE */
+        }
+
+        /* 2. REVEAL STATE: Smooth Transition (Nice Reveal) */
+        .reveal { 
+            filter: blur(0); 
+            background: rgba(231, 76, 60, 0.1); 
+            color: #e74c3c;
+            transition: all 0.5s ease-out; /* Smooth fade in */
+        }
+        
+        .hint-text { color: #95a5a6; margin-top: 20px; font-size: 1.2em; font-style: italic; }
 
         /* --- CONTROLS --- */
-        .controls-bar { margin-top: 40px; display: flex; gap: 20px; z-index: 10; }
+        .controls-bar { margin-top: 30px; display: flex; gap: 20px; z-index: 10; flex-wrap: wrap; justify-content: center; }
 
         .btn {
             border: none; padding: 15px 40px; font-size: 1.5em; border-radius: 50px;
             cursor: pointer; font-family: 'Fredoka One'; transition: 0.2s;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2); touch-action: manipulation;
         }
         .btn:active { transform: translateY(4px); box-shadow: none; }
         
         .btn-nav { background: #f1c40f; color: #333; }
         .btn-whiteboard { background: #2c3e50; color: white; border: 2px solid white; box-shadow: 0 6px 0 #1a252f; }
         
-        /* EXIT BUTTON STYLE */
-        .btn-exit { 
-            background: #c0392b; color: white; position: absolute; top: 20px; right: 20px; 
-            font-size: 1.2em; padding: 10px 30px; border: 2px solid rgba(255,255,255,0.3);
-            z-index: 200; /* High z-index to make sure it's clickable */
+        .top-bar { position: absolute; top: 20px; right: 20px; z-index: 200; display: flex; gap: 10px; }
+        .btn-small { 
+            background: #c0392b; color: white; font-size: 1em; padding: 10px 25px; 
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 30px; cursor: pointer; font-weight: bold;
         }
-        .btn-exit:hover { background: #e74c3c; }
+        .btn-menu { background: #34495e; }
 
-        /* --- WHITEBOARD OVERLAY --- */
+        /* --- BLACKBOARD --- */
         #whiteboard-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 100; display: none; cursor: crosshair;
+            background: #1e1e1e; z-index: 400; display: none; cursor: crosshair;
         }
 
         #wb-toolbar {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #eee; padding: 15px 30px; border-radius: 60px;
+            background: #333; padding: 15px 30px; border-radius: 60px;
             display: flex; align-items: center; gap: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #ccc;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #555;
         }
 
-        .tool-group { display: flex; gap: 10px; border-right: 2px solid #ccc; padding-right: 20px; }
-        .tool-btn { width: 45px; height: 45px; border-radius: 50%; border: 3px solid white; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .tool-group { display: flex; gap: 10px; border-right: 2px solid #555; padding-right: 20px; }
+        .tool-btn { width: 50px; height: 50px; border-radius: 50%; border: 3px solid #555; cursor: pointer; transition: 0.2s; }
         .tool-btn:hover { transform: scale(1.1); }
-        .tool-btn.active { border-color: #333; transform: scale(1.2); z-index: 5; }
+        .tool-btn.active { border-color: white; transform: scale(1.2); z-index: 5; }
 
-        .color-black { background: black; }
-        .color-red { background: #e74c3c; }
-        .color-blue { background: #3498db; }
-        .color-green { background: #2ecc71; }
-        
-        .btn-eraser { background: white; font-size: 1.5em; display: flex; align-items: center; justify-content: center; }
+        .color-white { background: white; }
+        .color-yellow { background: #f1c40f; }
+        .color-cyan { background: #00d2d3; }
+        .color-pink { background: #ff9ff3; }
+        .btn-eraser { background: #555; font-size: 1.5em; display: flex; align-items: center; justify-content: center; }
 
-        /* SLIDER STYLE */
-        .slider-group { display: flex; align-items: center; gap: 10px; color: #333; font-weight: bold; }
+        .slider-group { display: flex; align-items: center; gap: 10px; color: white; font-weight: bold; }
         input[type=range] { width: 100px; cursor: pointer; }
 
         .btn-close-wb {
             background: #c0392b; color: white; font-family: 'Fredoka One'; border: none;
-            padding: 10px 30px; border-radius: 30px; font-size: 1.2em; cursor: pointer;
-            margin-left: 10px;
+            padding: 10px 30px; border-radius: 30px; font-size: 1.2em; cursor: pointer; margin-left: 10px;
+        }
+
+        .wb-warning {
+            position: absolute; top: 20px; left: 20px;
+            color: rgba(255,255,255,0.3); font-size: 1.2em; font-weight: bold;
+            pointer-events: none; text-transform: uppercase; letter-spacing: 2px;
         }
 
     </style>
 </head>
 <body>
 
-    <button class="btn btn-exit" onclick="window.location.href='index.html'">EXIT 🏠</button>
+    <div id="difficulty-screen">
+        <div class="title-large">CHOOSE LEVEL</div>
+        <div class="btn-container">
+            <button class="level-btn btn-easy" onclick="selectLevel('easy')">EASY (100+)</button>
+            <button class="level-btn btn-medium" onclick="selectLevel('medium')">MEDIUM (100+)</button>
+            <button class="level-btn btn-hard" onclick="selectLevel('hard')">HARD (100+)</button>
+        </div>
+        <button class="btn-small" style="margin-top: 50px; background: transparent; border: 2px solid #ccc;" onclick="window.location.href='index.html'">EXIT TO HUB</button>
+    </div>
+
+    <div class="top-bar">
+        <button class="btn-small btn-menu" onclick="showMenu()">☰ CHANGE LEVEL</button>
+        <button class="btn-small" onclick="window.location.href='index.html'">EXIT 🏠</button>
+    </div>
 
     <div id="slide-stage">
         <div class="card-box">
@@ -126,104 +191,161 @@
     </div>
 
     <div id="whiteboard-overlay">
+        <div class="wb-warning">⚠️ Only for Writing, Not Drawing</div>
         <canvas id="drawing-canvas"></canvas>
-        
         <div id="wb-toolbar">
             <div class="tool-group">
-                <div class="tool-btn color-black active" onclick="setColor('black', this)"></div>
-                <div class="tool-btn color-red" onclick="setColor('#e74c3c', this)"></div>
-                <div class="tool-btn color-blue" onclick="setColor('#3498db', this)"></div>
-                <div class="tool-btn color-green" onclick="setColor('#2ecc71', this)"></div>
-                <button class="tool-btn btn-eraser" onclick="setEraser(this)">🧹</button>
+                <div class="tool-btn color-white active" onclick="setColor('white', this)"></div>
+                <div class="tool-btn color-yellow" onclick="setColor('#f1c40f', this)"></div>
+                <div class="tool-btn color-cyan" onclick="setColor('#00d2d3', this)"></div>
+                <div class="tool-btn color-pink" onclick="setColor('#ff9ff3', this)"></div>
+                <button class="tool-btn btn-eraser" onclick="setEraser(this)">🧽</button>
             </div>
-
             <div class="slider-group">
-                <span>🖊️ Boldness:</span>
+                <span>🖊️ Size:</span>
                 <input type="range" id="pen-size" min="2" max="30" value="5" oninput="updateSize(this.value)">
             </div>
-
             <button class="btn-close-wb" onclick="clearBoard()">CLEAR</button>
-            <button class="btn-close-wb" style="background:#333;" onclick="closeWhiteboard()">CLOSE ✖</button>
+            <button class="btn-close-wb" style="background:#444;" onclick="closeWhiteboard()">CLOSE ✖</button>
         </div>
     </div>
 
     <script>
-        // --- EXPANDED WORD DATABASE (200+ Words) ---
-        const words = [
-            // --- EASY / COMMON ---
-            { en: "Adventure", bn: "দুঃসাহসিক কাজ" }, { en: "Beautiful", bn: "সুন্দর" },
-            { en: "Curious", bn: "কৌতূহলী" }, { en: "Dangerous", bn: "বিপজ্জনক" },
-            { en: "Education", bn: "শিক্ষা" }, { en: "Fantastic", bn: "অসাধারণ" },
-            { en: "Generous", bn: "উদার" }, { en: "Holiday", bn: "ছুটির দিন" },
-            { en: "Important", bn: "গুরুত্বপূর্ণ" }, { en: "Journey", bn: "ভ্রমণ" },
-            { en: "Knowledge", bn: "জ্ঞান" }, { en: "Library", bn: "গ্রন্থাগার" },
-            { en: "Mountain", bn: "পাহাড়" }, { en: "Nature", bn: "প্রকৃতি" },
-            { en: "Ocean", bn: "সমুদ্র" }, { en: "Patient", bn: "ধৈর্যশীল" },
-            { en: "Question", bn: "প্রশ্ন" }, { en: "Respect", bn: "সম্মান" },
-            { en: "Scientist", bn: "বিজ্ঞানী" }, { en: "Together", bn: "একসাথে" },
-            { en: "Umbrella", bn: "ছাতা" }, { en: "Vacation", bn: "অবকাশ" },
-            { en: "Weather", bn: "আবহাওয়া" }, { en: "Yesterday", bn: "গতকাল" },
-            
-            // --- MEDIUM / ACADEMIC ---
-            { en: "Accommodate", bn: "মানিয়ে নেওয়া" }, { en: "Benevolent", bn: "পরোপকারী" },
-            { en: "Consequence", bn: "ফলাফল" }, { en: "Diligent", bn: "পরিশ্রমী" },
-            { en: "Efficient", bn: "দক্ষ" }, { en: "Frequent", bn: "ঘনঘন" },
-            { en: "Genuine", bn: "খাঁটি" }, { en: "Hesitate", bn: "দ্বিধা করা" },
-            { en: "Innocent", bn: "নির্দোষ" }, { en: "Jealous", bn: "ঈর্ষান্বিত" },
-            { en: "Keen", bn: "আগ্রহী" }, { en: "Leisure", bn: "অবসর" },
-            { en: "Moderate", bn: "মাঝারি" }, { en: "Narrate", bn: "বর্ণনা করা" },
-            { en: "Obedient", bn: "বাধ্য" }, { en: "Predict", bn: "ভবিষ্যদ্বাণী করা" },
-            { en: "Quality", bn: "গুণমান" }, { en: "Reliable", bn: "নির্ভরযোগ্য" },
-            { en: "Strategy", bn: "কৌশল" }, { en: "Tradition", bn: "ঐতিহ্য" },
-            { en: "Unique", bn: "অনন্য" }, { en: "Valuable", bn: "মূল্যবান" },
-            { en: "Wisdom", bn: "প্রজ্ঞা" }, { en: "Xenophobia", bn: "বিদেশী ভীতি" },
-            { en: "Youth", bn: "যৌবন" }, { en: "Zeal", bn: "প্রবল উৎসাহ" },
+        const vocabData = {
+            easy: [
+                // 1-20
+                { en: "Ant", bn: "পিঁপড়া" }, { en: "Apple", bn: "আপেল" }, { en: "Ball", bn: "বল" }, { en: "Bat", bn: "বাদুড়" }, { en: "Cat", bn: "বিড়াল" },
+                { en: "Cup", bn: "কাপ" }, { en: "Dog", bn: "কুকুর" }, { en: "Door", bn: "দরজা" }, { en: "Egg", bn: "ডিম" }, { en: "Eye", bn: "চোখ" },
+                { en: "Fan", bn: "পাখা" }, { en: "Fish", bn: "মাছ" }, { en: "Goat", bn: "ছাগল" }, { en: "Hat", bn: "টুপি" }, { en: "Ice", bn: "বরফ" },
+                { en: "Jar", bn: "বয়াম" }, { en: "Kite", bn: "ঘুরি" }, { en: "Lamp", bn: "বাতি" }, { en: "Man", bn: "মানুষ" }, { en: "Net", bn: "জাল" },
+                // 21-40
+                { en: "Owl", bn: "পেঁচা" }, { en: "Pen", bn: "কলম" }, { en: "Queen", bn: "রাণী" }, { en: "Rat", bn: "ইঁদুর" }, { en: "Sun", bn: "সূর্য" },
+                { en: "Tree", bn: "গাছ" }, { en: "Umbrella", bn: "ছাতা" }, { en: "Van", bn: "গাড়ি" }, { en: "Water", bn: "পানি" }, { en: "X-ray", bn: "রঞ্জনরশ্মি" },
+                { en: "Yak", bn: "চমরী গাই" }, { en: "Zebra", bn: "জেব্রা" }, { en: "Book", bn: "বই" }, { en: "Chair", bn: "চেয়ার" }, { en: "Table", bn: "টেবিল" },
+                { en: "Bird", bn: "পাখি" }, { en: "Cow", bn: "গরু" }, { en: "Milk", bn: "দুধ" }, { en: "Moon", bn: "চাঁদ" }, { en: "Star", bn: "তারা" },
+                // 41-60
+                { en: "Sky", bn: "আকাশ" }, { en: "River", bn: "নদী" }, { en: "Hand", bn: "হাত" }, { en: "Leg", bn: "পা" }, { en: "Head", bn: "মাথা" },
+                { en: "Hair", bn: "চুল" }, { en: "Nose", bn: "নাক" }, { en: "Ear", bn: "কান" }, { en: "Mouth", bn: "মুখ" }, { en: "Tooth", bn: "দাঁত" },
+                { en: "School", bn: "স্কুল" }, { en: "Home", bn: "বাড়ি" }, { en: "Room", bn: "কক্ষ" }, { en: "Bed", bn: "বিছানা" }, { en: "Food", bn: "খাবার" },
+                { en: "Rice", bn: "ভাত" }, { en: "Bread", bn: "রুটি" }, { en: "Bus", bn: "বাস" }, { en: "Car", bn: "গাড়ি" }, { en: "Ship", bn: "জাহাজ" },
+                // 61-80
+                { en: "Boat", bn: "নৌকা" }, { en: "Road", bn: "রাস্তা" }, { en: "Park", bn: "পার্ক" }, { en: "Garden", bn: "বাগান" }, { en: "Flower", bn: "ফুল" },
+                { en: "Fruit", bn: "ফল" }, { en: "Red", bn: "লাল" }, { en: "Blue", bn: "নীল" }, { en: "Green", bn: "সবুজ" }, { en: "Black", bn: "কালো" },
+                { en: "White", bn: "সাদা" }, { en: "Run", bn: "দৌড়ানো" }, { en: "Jump", bn: "লাফানো" }, { en: "Sleep", bn: "ঘুমানো" }, { en: "Eat", bn: "খাওয়া" },
+                { en: "Drink", bn: "পান করা" }, { en: "Play", bn: "খেলা" }, { en: "Read", bn: "পড়া" }, { en: "Write", bn: "লেখা" }, { en: "Listen", bn: "শোনা" },
+                // 81-100
+                { en: "Speak", bn: "বলা" }, { en: "Boy", bn: "বালক" }, { en: "Girl", bn: "বালিকা" }, { en: "Baby", bn: "শিশু" }, { en: "Father", bn: "বাবা" },
+                { en: "Mother", bn: "মা" }, { en: "Sister", bn: "বোন" }, { en: "Brother", bn: "ভাই" }, { en: "King", bn: "রাজা" }, { en: "Gold", bn: "স্বর্ণ" },
+                { en: "Silver", bn: "রৌপ্য" }, { en: "Doll", bn: "পুতুল" }, { en: "Toy", bn: "খেলনা" }, { en: "Box", bn: "বাক্স" }, { en: "Fox", bn: "শিয়াল" },
+                { en: "Lion", bn: "সিংহ" }, { en: "Tiger", bn: "বাঘ" }, { en: "Duck", bn: "হাঁস" }, { en: "Hen", bn: "মুরগি" }, { en: "Key", bn: "চাবি" },
+                // 101+ (Extra)
+                { en: "Lock", bn: "তালা" }, { en: "Map", bn: "মানচিত্র" }, { en: "Bag", bn: "থলে" }, { en: "Cap", bn: "টুপি (ক্যাপ)" }, { en: "Shoe", bn: "জুতা" }
+            ],
+            medium: [
+                // 1-20
+                { en: "Adventure", bn: "দুঃসাহসিক কাজ" }, { en: "Beautiful", bn: "সুন্দর" }, { en: "Curious", bn: "কৌতূহলী" }, { en: "Dangerous", bn: "বিপজ্জনক" }, { en: "Education", bn: "শিক্ষা" },
+                { en: "Fantastic", bn: "অসাধারণ" }, { en: "Generous", bn: "উদার" }, { en: "Holiday", bn: "ছুটির দিন" }, { en: "Important", bn: "গুরুত্বপূর্ণ" }, { en: "Journey", bn: "ভ্রমণ" },
+                { en: "Knowledge", bn: "জ্ঞান" }, { en: "Library", bn: "গ্রন্থাগার" }, { en: "Mountain", bn: "পাহাড়" }, { en: "Nature", bn: "প্রকৃতি" }, { en: "Ocean", bn: "সমুদ্র" },
+                { en: "Patient", bn: "ধৈর্যশীল" }, { en: "Question", bn: "প্রশ্ন" }, { en: "Respect", bn: "সম্মান" }, { en: "Scientist", bn: "বিজ্ঞানী" }, { en: "Together", bn: "একসাথে" },
+                // 21-40
+                { en: "Vacation", bn: "অবকাশ" }, { en: "Weather", bn: "আবহাওয়া" }, { en: "Yesterday", bn: "গতকাল" }, { en: "Tomorrow", bn: "আগামীকাল" }, { en: "Morning", bn: "সকাল" },
+                { en: "Evening", bn: "সন্ধ্যা" }, { en: "Night", bn: "রাত" }, { en: "Friend", bn: "বন্ধু" }, { en: "Family", bn: "পরিবার" }, { en: "Market", bn: "বাজার" },
+                { en: "Money", bn: "টাকা" }, { en: "Happy", bn: "সুখী" }, { en: "Sad", bn: "দুঃখিত" }, { en: "Angry", bn: "রাগান্বিত" }, { en: "Tired", bn: "ক্লান্ত" },
+                { en: "Hungry", bn: "ক্ষুধার্ত" }, { en: "Thirsty", bn: "তৃষ্ণার্ত" }, { en: "Strong", bn: "শক্তিশালী" }, { en: "Weak", bn: "দুর্বল" }, { en: "Clever", bn: "চালাক" },
+                // 41-60
+                { en: "Stupid", bn: "বোকা" }, { en: "Honest", bn: "সত্" }, { en: "Brave", bn: "সাহসী" }, { en: "Clean", bn: "পরিষ্কার" }, { en: "Dirty", bn: "নোংরা" },
+                { en: "Cheap", bn: "সস্তা" }, { en: "Expensive", bn: "দামী" }, { en: "Easy", bn: "সহজ" }, { en: "Difficult", bn: "কঠিন" }, { en: "Heavy", bn: "ভারী" },
+                { en: "Light", bn: "হালকা / আলো" }, { en: "Dark", bn: "অন্ধকার" }, { en: "Soft", bn: "নরম" }, { en: "Hard", bn: "কঠিন / শক্ত" }, { en: "Fast", bn: "দ্রুত" },
+                { en: "Slow", bn: "ধীর" }, { en: "Early", bn: "তাড়াতাড়ি" }, { en: "Late", bn: "দেরী" }, { en: "Always", bn: "সর্বদা" }, { en: "Never", bn: "কখনও না" },
+                // 61-80
+                { en: "Sometimes", bn: "মাঝে মাঝে" }, { en: "Often", bn: "প্রায়ই" }, { en: "Usually", bn: "সাধারণত" }, { en: "Suddenly", bn: "হঠাৎ" }, { en: "Finally", bn: "অবশেষে" },
+                { en: "Example", bn: "উদাহরণ" }, { en: "Reason", bn: "কারণ" }, { en: "Result", bn: "ফলাফল" }, { en: "Problem", bn: "সমস্যা" }, { en: "Solution", bn: "সমাধান" },
+                { en: "Advice", bn: "পরামর্শ" }, { en: "Promise", bn: "প্রতিশ্রুতি" }, { en: "Secret", bn: "গোপন" }, { en: "Message", bn: "বার্তা" }, { en: "Language", bn: "ভাষা" },
+                { en: "Village", bn: "গ্রাম" }, { en: "City", bn: "শহর" }, { en: "Country", bn: "দেশ" }, { en: "World", bn: "বিশ্ব" }, { en: "Island", bn: "দ্বীপ" },
+                // 81-100
+                { en: "Desert", bn: "মরুভূমি" }, { en: "Forest", bn: "বন" }, { en: "Bridge", bn: "সেতু" }, { en: "Building", bn: "ভবন" }, { en: "Office", bn: "অফিস" },
+                { en: "Factory", bn: "কারখানা" }, { en: "Doctor", bn: "ডাক্তার" }, { en: "Teacher", bn: "শিক্ষক" }, { en: "Student", bn: "ছাত্র" }, { en: "Driver", bn: "চালক" },
+                { en: "Farmer", bn: "কৃষক" }, { en: "Police", bn: "পুলিশ" }, { en: "Soldier", bn: "সৈনিক" }, { en: "Singer", bn: "গায়ক" }, { en: "Dancer", bn: "নর্তকী" },
+                { en: "Writer", bn: "লেখক" }, { en: "Player", bn: "খেলোয়াড়" }, { en: "Worker", bn: "শ্রমিক" }, { en: "Customer", bn: "ক্রেতা" }, { en: "Owner", bn: "মালিক" },
+                // 101+
+                { en: "Picture", bn: "ছবি" }, { en: "Music", bn: "সংগীত" }, { en: "Mirror", bn: "আয়না" }, { en: "Clock", bn: "ঘড়ি" }, { en: "Calendar", bn: "পঞ্জিকা" }
+            ],
+            hard: [
+                // 1-20
+                { en: "Accommodate", bn: "মানিয়ে নেওয়া" }, { en: "Benevolent", bn: "পরোপকারী" }, { en: "Consequence", bn: "ফলাফল" }, { en: "Diligent", bn: "পরিশ্রমী" }, { en: "Efficient", bn: "দক্ষ" },
+                { en: "Frequent", bn: "ঘনঘন" }, { en: "Genuine", bn: "খাঁটি" }, { en: "Hesitate", bn: "দ্বিধা করা" }, { en: "Innocent", bn: "নির্দোষ" }, { en: "Jealous", bn: "ঈর্ষান্বিত" },
+                { en: "Keen", bn: "আগ্রহী" }, { en: "Leisure", bn: "অবসর" }, { en: "Moderate", bn: "মাঝারি" }, { en: "Narrate", bn: "বর্ণনা করা" }, { en: "Obedient", bn: "বাধ্য" },
+                { en: "Predict", bn: "ভবিষ্যদ্বাণী করা" }, { en: "Quality", bn: "গুণমান" }, { en: "Reliable", bn: "নির্ভরযোগ্য" }, { en: "Strategy", bn: "কৌশল" }, { en: "Tradition", bn: "ঐতিহ্য" },
+                // 21-40
+                { en: "Unique", bn: "অনন্য" }, { en: "Valuable", bn: "মূল্যবান" }, { en: "Wisdom", bn: "প্রজ্ঞা" }, { en: "Xenophobia", bn: "বিদেশী ভীতি" }, { en: "Youth", bn: "যৌবন" },
+                { en: "Zeal", bn: "প্রবল উৎসাহ" }, { en: "Ambiguous", bn: "অস্পষ্ট" }, { en: "Bureaucracy", bn: "আমলাতন্ত্র" }, { en: "Chronological", bn: "কালানুক্রমিক" }, { en: "Deteriorate", bn: "অবনতি ঘটা" },
+                { en: "Enthusiastic", bn: "উৎসাহী" }, { en: "Fluctuate", bn: "ওঠানামা করা" }, { en: "Hypocrisy", bn: "ভণ্ডামি" }, { en: "Inevitable", bn: "অনিবার্য" }, { en: "Justification", bn: "যৌক্তিকতা" },
+                { en: "Kleptomania", bn: "চুরির বাতিক" }, { en: "Legitimate", bn: "বৈধ" }, { en: "Metaphor", bn: "রূপক" }, { en: "Nostalgia", bn: "অতীতের স্মৃতি" }, { en: "Optimistic", bn: "আশাবাদী" },
+                // 41-60
+                { en: "Pessimistic", bn: "নৈরাশ্যবাদী" }, { en: "Quarantine", bn: "সঙ্গনিরোধ" }, { en: "Rejuvenate", bn: "সজীব করা" }, { en: "Simultaneous", bn: "যুগপৎ" }, { en: "Transparent", bn: "স্বচ্ছ" },
+                { en: "Unanimous", bn: "সর্বসম্মত" }, { en: "Vulnerable", bn: "অরক্ষিত" }, { en: "Wholesome", bn: "স্বাস্থ্যকর" }, { en: "Atmosphere", bn: "বায়ুমণ্ডল" }, { en: "Bacteria", bn: "ব্যাকটেরিয়া" },
+                { en: "Climate", bn: "জলবায়ু" }, { en: "Digestion", bn: "হজম" }, { en: "Ecosystem", bn: "বাস্তুতন্ত্র" }, { en: "Fossil", bn: "জীবাশ্ম" }, { en: "Gravity", bn: "মাধ্যাকর্ষণ" },
+                { en: "Habitat", bn: "আবাসস্থল" }, { en: "Invention", bn: "আবিষ্কার" }, { en: "Jupiter", bn: "বৃহস্পতি গ্রহ" }, { en: "Kinetic", bn: "গতিশীল" }, { en: "Laboratory", bn: "গবেষণাগার" },
+                // 61-80
+                { en: "Microscope", bn: "অণুবীক্ষণ যন্ত্র" }, { en: "Nutrition", bn: "পুষ্টি" }, { en: "Oxygen", bn: "অক্সিজেন" }, { en: "Pollution", bn: "দূষণ" }, { en: "Quantity", bn: "পরিমাণ" },
+                { en: "Radiation", bn: "বিকিরণ" }, { en: "Satellite", bn: "উপগ্রহ" }, { en: "Temperature", bn: "তাপমাত্রা" }, { en: "Velocity", bn: "বেগ" }, { en: "Zoology", bn: "প্রাণীবিদ্যা" },
+                { en: "Agriculture", bn: "কৃষি" }, { en: "Biology", bn: "জীববিজ্ঞান" }, { en: "Chemistry", bn: "রসায়ন" }, { en: "Physics", bn: "পদার্থবিজ্ঞান" }, { en: "Galaxy", bn: "ছায়াপথ" },
+                { en: "Universe", bn: "মহাবিশ্ব" }, { en: "Volcano", bn: "আগ্নেয়গিরি" }, { en: "Earthquake", bn: "ভূমিকম্প" }, { en: "Authority", bn: "কর্তৃত্ব" }, { en: "Business", bn: "ব্যবসা" },
+                // 81-100
+                { en: "Commercial", bn: "বাণিজ্যিক" }, { en: "Democracy", bn: "গণতন্ত্র" }, { en: "Economy", bn: "অর্থনীতি" }, { en: "Finance", bn: "অর্থসংস্থান" }, { en: "Government", bn: "সরকার" },
+                { en: "History", bn: "ইতিহাস" }, { en: "Industry", bn: "শিল্প" }, { en: "Justice", bn: "ন্যায়বিচার" }, { en: "Kingdom", bn: "রাজ্য" }, { en: "Leader", bn: "নেতা" },
+                { en: "Management", bn: "ব্যবস্থাপনা" }, { en: "Nation", bn: "জাতি" }, { en: "Opinion", bn: "মতামত" }, { en: "Politics", bn: "রাজনীতি" }, { en: "Republic", bn: "প্রজাতন্ত্র" },
+                { en: "Society", bn: "সমাজ" }, { en: "Trade", bn: "বাণিজ্য" }, { en: "Architecture", bn: "স্থাপত্য" }, { en: "Psychology", bn: "মনোবিজ্ঞান" }, { en: "Literature", bn: "সাহিত্য" },
+                // 101+
+                { en: "Philosophy", bn: "দর্শন" }, { en: "Revolution", bn: "বিপ্লব" }, { en: "Constitution", bn: "সংবিধান" }, { en: "Civilization", bn: "সভ্যতা" }, { en: "Generation", bn: "প্রজন্ম" }
+            ]
+        };
 
-            // --- HARD / CHALLENGING ---
-            { en: "Ambiguous", bn: "অস্পষ্ট" }, { en: "Bureaucracy", bn: "আমলাতন্ত্র" },
-            { en: "Chronological", bn: "কালানুক্রমিক" }, { en: "Deteriorate", bn: "অবনতি ঘটা" },
-            { en: "Enthusiastic", bn: "উৎসাহী" }, { en: "Fluctuate", bn: "ওঠানামা করা" },
-            { en: "Hypocrisy", bn: "ভণ্ডামি" }, { en: "Inevitable", bn: "অনিবার্য" },
-            { en: "Justification", bn: "যৌক্তিকতা" }, { en: "Kleptomania", bn: "চুরির বাতিক" },
-            { en: "Legitimate", bn: "বৈধ" }, { en: "Metaphor", bn: "রূপক" },
-            { en: "Nostalgia", bn: "অতীতের স্মৃতি" }, { en: "Optimistic", bn: "আশাবাদী" },
-            { en: "Pessimistic", bn: "নৈরাশ্যবাদী" }, { en: "Quarantine", bn: "সঙ্গনিরোধ" },
-            { en: "Rejuvenate", bn: "সজীব করা" }, { en: "Simultaneous", bn: "যুগপৎ / একই সাথে" },
-            { en: "Transparent", bn: "স্বচ্ছ" }, { en: "Unanimous", bn: "সর্বসম্মত" },
-            { en: "Vulnerable", bn: "অরক্ষিত" }, { en: "Wholesome", bn: "স্বাস্থ্যকর" },
-            
-            // --- SCIENCE & NATURE ---
-            { en: "Atmosphere", bn: "বায়ুমণ্ডল" }, { en: "Bacteria", bn: "ব্যাকটেরিয়া" },
-            { en: "Climate", bn: "জলবায়ু" }, { en: "Digestion", bn: "হজম" },
-            { en: "Ecosystem", bn: "বাস্তুতন্ত্র" }, { en: "Fossil", bn: "জীবাশ্ম" },
-            { en: "Gravity", bn: "মাধ্যাকর্ষণ" }, { en: "Habitat", bn: "আবাসস্থল" },
-            { en: "Invention", bn: "আবিষ্কার" }, { en: "Jupiter", bn: "বৃহস্পতি গ্রহ" },
-            { en: "Kinetic", bn: "গতিশীল" }, { en: "Laboratory", bn: "গবেষণাগার" },
-            { en: "Microscope", bn: "অণুবীক্ষণ যন্ত্র" }, { en: "Nutrition", bn: "পুষ্টি" },
-            { en: "Oxygen", bn: "অক্সিজেন" }, { en: "Pollution", bn: "দূষণ" },
-            { en: "Quantity", bn: "পরিমাণ" }, { en: "Radiation", bn: "বিকিরণ" },
-            { en: "Satellite", bn: "উপগ্রহ" }, { en: "Temperature", bn: "তাপমাত্রা" },
-            { en: "Velocity", bn: "বেগ" }, { en: "Zoology", bn: "প্রাণীবিদ্যা" }
-        ];
-
+        let currentList = [];
         let currentIndex = 0;
 
-        // --- SLIDE FUNCTIONS ---
+        function selectLevel(level) {
+            currentList = vocabData[level];
+            currentIndex = 0;
+            document.getElementById('difficulty-screen').classList.add('hidden');
+            document.getElementById('slide-stage').style.display = 'flex';
+            renderSlide();
+        }
+
+        function showMenu() {
+            document.getElementById('difficulty-screen').classList.remove('hidden');
+            document.getElementById('slide-stage').style.display = 'none';
+        }
+
         function renderSlide() {
-            const wordObj = words[currentIndex];
+            if (currentList.length === 0) return;
+            const wordObj = currentList[currentIndex];
             document.getElementById('english-word').innerText = wordObj.en;
+            
             const bnText = document.getElementById('bangla-meaning');
+            
+            // --- FIX FOR GHOST TEXT ---
+            // 1. Force remove 'reveal' class
+            bnText.classList.remove('reveal');
+            // 2. Force add 'blur' class
+            bnText.classList.add('blur');
+            // 3. Change text immediately
             bnText.innerText = wordObj.bn;
-            bnText.className = "blur"; // Default hidden
         }
 
         function toggleReveal() {
             const bnText = document.getElementById('bangla-meaning');
-            bnText.className = bnText.classList.contains('blur') ? "reveal" : "blur";
+            if (bnText.classList.contains('blur')) {
+                bnText.classList.remove('blur');
+                bnText.classList.add('reveal');
+            } else {
+                bnText.classList.remove('reveal');
+                bnText.classList.add('blur');
+            }
         }
 
         function nextSlide() {
-            if (currentIndex < words.length - 1) {
+            if (currentIndex < currentList.length - 1) {
                 currentIndex++;
                 renderSlide();
             }
@@ -236,7 +358,6 @@
             }
         }
         
-        // Keyboard support for slides
         document.addEventListener('keydown', (e) => {
             if (document.getElementById('whiteboard-overlay').style.display === 'block') return;
             if (e.key === 'ArrowRight') nextSlide();
@@ -244,13 +365,11 @@
             if (e.key === ' ' || e.key === 'Enter') toggleReveal();
         });
 
-        renderSlide(); // Init
-
-        // --- WHITEBOARD FUNCTIONS ---
+        // --- WHITEBOARD ---
         const canvas = document.getElementById('drawing-canvas');
         const ctx = canvas.getContext('2d');
         let painting = false;
-        let currentColor = "black";
+        let currentColor = "white"; 
         let currentSize = 5;
 
         function resizeCanvas() {
@@ -283,8 +402,8 @@
             }
 
             ctx.lineWidth = currentSize;
-            ctx.lineCap = 'round'; // Smooth edges
-            ctx.lineJoin = 'round'; // Smooth corners
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
             ctx.strokeStyle = currentColor;
 
             ctx.lineTo(clientX, clientY);
@@ -293,12 +412,10 @@
             ctx.moveTo(clientX, clientY);
         }
 
-        // Event Listeners
         ['mousedown', 'touchstart'].forEach(evt => canvas.addEventListener(evt, startPosition));
         ['mouseup', 'touchend'].forEach(evt => canvas.addEventListener(evt, endPosition));
         ['mousemove', 'touchmove'].forEach(evt => canvas.addEventListener(evt, draw));
 
-        // Toolbar Logic
         function openWhiteboard() {
             document.getElementById('whiteboard-overlay').style.display = 'block';
         }
@@ -309,22 +426,20 @@
 
         function setColor(color, btn) {
             currentColor = color;
-            // Restore size if we were erasing
             currentSize = document.getElementById('pen-size').value; 
             updateActiveBtn(btn);
         }
 
         function setEraser(btn) {
-            currentColor = "white";
-            // Eraser acts relative to size, but bigger
-            currentSize = document.getElementById('pen-size').value * 2; 
+            currentColor = "#1e1e1e"; 
+            currentSize = document.getElementById('pen-size').value * 4; 
             updateActiveBtn(btn);
         }
 
         function updateSize(val) {
             currentSize = val;
-            if (currentColor === "white") {
-                currentSize = val * 2; // Keep eraser bigger
+            if (currentColor === "#1e1e1e") {
+                currentSize = val * 4; 
             }
         }
 
